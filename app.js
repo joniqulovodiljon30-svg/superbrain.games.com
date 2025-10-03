@@ -202,3 +202,123 @@ window.handleAvatarUpload = handleAvatarUpload;
 window.uploadAvatar = function() {
     document.getElementById('avatar-input').click();
 };
+// ==================== RAQAMLAR FUNCTIONS ====================
+
+function startNumbersGame() {
+    console.log("🔢 Raqamlar o'yini boshlandi");
+    
+    const numbersCount = parseInt(document.getElementById('numbers-count').value);
+    const timeLimit = parseInt(document.getElementById('numbers-time').value);
+    
+    console.log("📊 Sozlamalar:", { numbersCount, timeLimit });
+    
+    // Tasodifiy raqamlarni yaratish
+    numbersToMemorize = [];
+    for (let i = 0; i < numbersCount; i++) {
+        numbersToMemorize.push(Math.floor(Math.random() * 10));
+    }
+    
+    console.log("🎲 Yaratilgan raqamlar:", numbersToMemorize);
+    
+    // Raqamlarni ko'rsatish
+    document.getElementById('numbers-display').textContent = numbersToMemorize.join(' ');
+    
+    // Vaqtni sozlash
+    timeLeft = timeLimit;
+    document.getElementById('numbers-timer').textContent = timeLeft;
+    
+    // Eslab qolish sahifasiga o'tish
+    showSection('numbers-memorization');
+    console.log("✅ Eslab qolish sahifasiga o'tildi");
+    
+    // Taymerni ishga tushirish
+    clearInterval(timer);
+    timer = setInterval(() => {
+        timeLeft--;
+        document.getElementById('numbers-timer').textContent = timeLeft;
+        
+        if (timeLeft <= 0) {
+            clearInterval(timer);
+            showNumbersInputSection();
+        }
+    }, 1000);
+}
+
+function showNumbersInputSection() {
+    console.log("⌨️ Kirish sahifasiga o'tish");
+    showSection('numbers-input');
+    
+    // Kirish maydonlarini yaratish
+    const inputGrid = document.getElementById('numbers-input-grid');
+    inputGrid.innerHTML = '';
+    
+    for (let i = 0; i < numbersToMemorize.length; i++) {
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'number-input';
+        input.maxLength = 1;
+        input.dataset.index = i;
+        
+        // Enter bosganda keyingi katakka o'tish
+        input.addEventListener('keyup', function(e) {
+            if (e.key === 'Enter' || this.value.length === 1) {
+                const nextIndex = parseInt(this.dataset.index) + 1;
+                const nextInput = document.querySelector(`.number-input[data-index="${nextIndex}"]`);
+                if (nextInput) {
+                    nextInput.focus();
+                }
+            }
+        });
+        
+        inputGrid.appendChild(input);
+    }
+    
+    // Birinchi katakni fokus qilish
+    const firstInput = document.querySelector('.number-input');
+    if (firstInput) firstInput.focus();
+}
+
+function checkNumbersAnswers() {
+    console.log("✅ Javoblarni tekshirish");
+    
+    const inputs = document.querySelectorAll('.number-input');
+    const resultsList = document.getElementById('numbers-results-list');
+    resultsList.innerHTML = '';
+    
+    let correctCount = 0;
+    let incorrectCount = 0;
+    
+    for (let i = 0; i < inputs.length; i++) {
+        const userAnswer = inputs[i].value.trim();
+        const correctAnswer = numbersToMemorize[i].toString();
+        
+        const resultItem = document.createElement('div');
+        resultItem.className = 'result-item';
+        
+        if (userAnswer === correctAnswer) {
+            resultItem.innerHTML = `<span class="correct">${i + 1}. ${userAnswer}</span>`;
+            correctCount++;
+        } else {
+            resultItem.innerHTML = `
+                <span class="incorrect">${i + 1}. ${userAnswer}</span>
+                <span class="correct-answer">${correctAnswer}</span>
+            `;
+            incorrectCount++;
+        }
+        
+        resultsList.appendChild(resultItem);
+    }
+    
+    // Statistika
+    document.getElementById('numbers-correct-count').textContent = correctCount;
+    document.getElementById('numbers-incorrect-count').textContent = incorrectCount;
+    document.getElementById('numbers-accuracy').textContent = `${Math.round((correctCount / numbersToMemorize.length) * 100)}%`;
+    
+    // Natijalar bo'limini ko'rsatish
+    showSection('numbers-results');
+    console.log("🎯 Natijalar ko'rsatildi");
+}
+
+// Global funksiyalarni qo'shamiz
+window.startNumbersGame = startNumbersGame;
+window.checkNumbersAnswers = checkNumbersAnswers;
