@@ -202,5 +202,3 @@ window.handleAvatarUpload = handleAvatarUpload;
 window.uploadAvatar = function() {
     document.getElementById('avatar-input').click();
 };
-
-console.log("🎉 app.js to'liq yuklandi!");
