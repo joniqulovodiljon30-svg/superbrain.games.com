@@ -813,5 +813,3 @@ window.checkImagesAnswers = checkImagesAnswers;
 
 // Natijalar
 window.filterResults = filterResults;
-
-console.log("🎉 BARCHA FUNKSIYALAR YUKLANDI!");
