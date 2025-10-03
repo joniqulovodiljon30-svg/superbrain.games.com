@@ -1,3 +1,5 @@
+// Debug uchun
+console.log("app.js yuklandi!");
 // Global o'zgaruvchilar
 let currentUser = null;
 let currentSection = 'login-section';
