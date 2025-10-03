@@ -1,5 +1,15 @@
 // Global o'zgaruvchilar
 let currentUser = null;
+// Global o'zgaruvchilar
+let currentUser = null;
+let currentSection = 'login-section';
+let numbersToMemorize = [];
+let wordsToMemorize = [];
+let facesToMemorize = [];
+let imagesToMemorize = [];
+let timer;
+let timeLeft;
+let testHistory = [];
 let currentSection = 'login-section';
 let numbersToMemorize = [];
 let wordsToMemorize = [];
@@ -971,3 +981,4 @@ function addToHistory(category, correct, incorrect, total) {
     
     console.log("💾 Tarixga qo'shildi:", testResult);
 }
+
