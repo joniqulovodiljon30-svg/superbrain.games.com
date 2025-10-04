@@ -383,4 +383,14 @@ class WordsGame {
 }
 
 // Global instance yaratish
+
 const WordsGameInstance = new WordsGame();
+
+console.log('📝 WordsGame module loaded');
+
+// Global instance yaratish - BU MAUHIM!
+if (typeof WordsGameInstance === 'undefined') {
+    console.log('🔄 Creating WordsGameInstance...');
+    const WordsGameInstance = new WordsGame();
+    window.WordsGameInstance = WordsGameInstance;
+}
