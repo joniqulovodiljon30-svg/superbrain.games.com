@@ -1,4 +1,4 @@
-// LocalStorage boshqaruvchi
+// utils/storage.js - Tuzatilgan versiya
 const StorageManager = {
     // Kalitlar
     KEYS: {
@@ -82,18 +82,6 @@ const StorageManager = {
         }
     },
 
-    // Ismni yangilash
-    updateName(newName) {
-        try {
-            const profile = this.getProfile();
-            profile.name = newName;
-            return this.saveProfile(profile);
-        } catch (error) {
-            console.error('Ism yangilashda xato:', error);
-            return false;
-        }
-    },
-
     // O'yin natijasini saqlash
     saveGameResult(gameData) {
         try {
@@ -109,18 +97,11 @@ const StorageManager = {
                 settings: gameData.settings || {}
             };
 
-            results.unshift(result); // Yangi natijani boshiga qo'shish
-
-            // Faqat oxirgi 100 ta natijani saqlash
-            if (results.length > 100) {
-                results.splice(100);
-            }
+            results.unshift(result);
+            if (results.length > 100) results.splice(100);
 
             localStorage.setItem(this.KEYS.GAME_RESULTS, JSON.stringify(results));
-
-            // Statistikani yangilash
             this.updateStats(gameData);
-
             return true;
         } catch (error) {
             console.error('Natija saqlashda xato:', error);
@@ -139,53 +120,36 @@ const StorageManager = {
         }
     },
 
-    // O'yin turi bo'yicha natijalarni o'qish
-    getGameResultsByType(gameType) {
-        const results = this.getGameResults();
-        return results.filter(result => result.gameType === gameType);
-    },
-
     // Statistikani yangilash
     updateStats(gameData) {
         try {
             const stats = this.getStats();
             const profile = this.getProfile();
 
-            // Umumiy statistikani yangilash
             stats.totalGames = (stats.totalGames || 0) + 1;
             stats.totalScore = (stats.totalScore || 0) + gameData.score;
             stats.averageScore = Math.round(stats.totalScore / stats.totalGames);
 
-            // O'yin turi bo'yicha statistikani yangilash
             if (!stats.games) stats.games = {};
             if (!stats.games[gameData.gameType]) {
-                stats.games[gameData.gameType] = {
-                    played: 0,
-                    totalScore: 0,
-                    bestScore: 0
-                };
+                stats.games[gameData.gameType] = { played: 0, totalScore: 0, bestScore: 0 };
             }
 
             const gameStats = stats.games[gameData.gameType];
             gameStats.played++;
             gameStats.totalScore += gameData.score;
-            
             if (gameData.score > gameStats.bestScore) {
                 gameStats.bestScore = gameData.score;
             }
 
-            // Profilni yangilash
             profile.gamesPlayed = stats.totalGames;
             profile.totalScore = stats.totalScore;
-            
             if (gameData.score > profile.bestScores[gameData.gameType]) {
                 profile.bestScores[gameData.gameType] = gameData.score;
             }
 
-            // Yangilangan ma'lumotlarni saqlash
             localStorage.setItem(this.KEYS.GAME_STATS, JSON.stringify(stats));
             this.saveProfile(profile);
-
             return true;
         } catch (error) {
             console.error('Statistika yangilashda xato:', error);
@@ -218,10 +182,7 @@ const StorageManager = {
     saveFlashcardsProgress(language, topic, progress) {
         try {
             const allProgress = this.getFlashcardsProgress();
-            
-            if (!allProgress[language]) {
-                allProgress[language] = {};
-            }
+            if (!allProgress[language]) allProgress[language] = {};
             
             allProgress[language][topic] = {
                 ...progress,
@@ -256,80 +217,8 @@ const StorageManager = {
             mastered: 0,
             lastPracticed: null
         };
-    },
-
-    // Sozlamalarni saqlash
-    saveSettings(settings) {
-        try {
-            localStorage.setItem(this.KEYS.APP_SETTINGS, JSON.stringify(settings));
-            return true;
-        } catch (error) {
-            console.error('Sozlamalar saqlashda xato:', error);
-            return false;
-        }
-    },
-
-    // Sozlamalarni o'qish
-    getSettings() {
-        try {
-            const settings = localStorage.getItem(this.KEYS.APP_SETTINGS);
-            return settings ? JSON.parse(settings) : {
-                sound: true,
-                animations: true,
-                difficulty: 'medium',
-                language: 'uzbek'
-            };
-        } catch (error) {
-            console.error('Sozlamalar o\'qishda xato:', error);
-            return {
-                sound: true,
-                animations: true,
-                difficulty: 'medium',
-                language: 'uzbek'
-            };
-        }
-    },
-
-    // Ma'lumotlarni tozalash
-    clearData() {
-        try {
-            localStorage.removeItem(this.KEYS.USER_PROFILE);
-            localStorage.removeItem(this.KEYS.GAME_RESULTS);
-            localStorage.removeItem(this.KEYS.GAME_STATS);
-            localStorage.removeItem(this.KEYS.FLASHCARDS_PROGRESS);
-            localStorage.removeItem(this.KEYS.APP_SETTINGS);
-            return true;
-        } catch (error) {
-            console.error('Ma\'lumotlarni tozalashda xato:', error);
-            return false;
-        }
-    },
-
-    // Saqlash joyini tekshirish
-    checkStorage() {
-        try {
-            const test = 'test';
-            localStorage.setItem(test, test);
-            localStorage.removeItem(test);
-            return true;
-        } catch (error) {
-            console.error('LocalStorage ishlamayapti:', error);
-            return false;
-        }
-    },
-
-    // Ma'lumotlar hajmini o'lchash
-    getStorageSize() {
-        try {
-            let total = 0;
-            for (const key in localStorage) {
-                if (localStorage.hasOwnProperty(key)) {
-                    total += localStorage[key].length;
-                }
-            }
-            return total;
-        } catch (error) {
-            return 0;
-        }
     }
 };
+
+// GLOBAL QILISH MUHIM!
+window.StorageManager = StorageManager;
