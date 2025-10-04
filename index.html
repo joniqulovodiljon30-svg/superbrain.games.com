@@ -1258,286 +1258,298 @@
                 document.getElementById('header-user-name').textContent = name;
             }
 
-            showSection(sectionId) {
-                console.log('📱 Showing section:', sectionId);
-                
-                // Barcha sectionlarni yashirish
-                document.querySelectorAll('section').forEach(section => {
-                    section.style.display = 'none';
-                    section.classList.remove('active');
-                });
-                
-                // Tanlangan sectionni ko'rsatish
-                const targetSection = document.getElementById(sectionId);
-                if (targetSection) {
-                    targetSection.style.display = 'block';
-                    setTimeout(() => {
-                        targetSection.classList.add('active');
-                    }, 50);
-                }
-            }
+           // ... avvalgi kodlar ...
 
-            startGameMode(gameType) {
-                console.log('🚀 Starting game mode:', gameType);
-                this.currentGame = gameType;
-                this.showSection('game-area');
-                
-                const gameContent = document.getElementById('game-content');
-                
-                // Reset game info
-                this.updateGameInfo(0, 0, '00:00');
-
-                switch(gameType) {
-                    case 'numbers':
-                        this.showNumbersGame(gameContent);
-                        break;
-                    case 'words':
-                        this.showWordsGame(gameContent);
-                        break;
-                    case 'flashcards':
-                        this.showFlashcardsGame(gameContent);
-                        break;
-                    case 'faces':
-                        this.showComingSoon(gameContent, 'Yuz va Ismlar O\'yini');
-                        break;
-                    case 'images':
-                        this.showComingSoon(gameContent, 'Rasmlar O\'yini');
-                        break;
-                    case 'results':
-                        this.showComingSoon(gameContent, 'Mening Natijalarim');
-                        break;
-                    default:
-                        this.showComingSoon(gameContent, 'Bu O\'yin');
-                }
-            }
-
-            updateGameInfo(score, steps, time) {
-                document.getElementById('current-score').textContent = score;
-                document.getElementById('current-step').textContent = steps;
-                document.getElementById('game-timer').textContent = time;
-            }
-
-            showNumbersGame(container) {
-                console.log('🔢 Showing numbers game');
-                
-                // Tasodifiy raqamlar ketma-ketligini yaratish
-                const sequenceLength = 4; // 4 ta raqam
-                const sequence = this.generateRandomSequence(sequenceLength);
-                const displayTime = 3000; // 3 soniya
-                
-                container.innerHTML = `
-                    <div class="numbers-game">
-                        <h2 style="font-size: 1.75rem; margin-bottom: 1rem;">🔢 Raqamlar O'yini</h2>
-                        <p style="font-size: 1rem; color: var(--text-secondary); margin-bottom: 2rem;">
-                            ${sequenceLength} ta raqamni eslab qoling va takrorlang
-                        </p>
-                        
-                        <div class="numbers-display" id="numbers-display">
-                            ${sequence.map(num => `
-                                <div class="number-display-card">${num}</div>
-                            `).join('')}
-                        </div>
-                        
-                        <p id="countdown-text" style="font-size: 1rem; margin: 1.5rem 0;">
-                            Raqamlar ${displayTime/1000} soniyadan so'ng yopiladi...
-                        </p>
-                        
-                        <button class="action-button primary" onclick="memoryMaster.startNumbersInput(${sequenceLength})" id="ready-btn" style="display: none; margin: 0 auto;">
-                            <i class="fas fa-play"></i>
-                            Tayyorman
-                        </button>
+showWordsGame(container) {
+    console.log('📝 Showing words game');
+    
+    const words = ['OLMA', 'BANAN', 'APELSIN', 'NOK', 'OLCHA'];
+    const displayTime = 5000; // 5 soniya
+    
+    container.innerHTML = `
+        <div style="text-align: center; max-width: 600px; margin: 0 auto;">
+            <h2 style="font-size: 1.75rem; margin-bottom: 1rem;">📝 So'zlar O'yini</h2>
+            <p style="font-size: 1rem; color: var(--text-secondary); margin-bottom: 2rem;">
+                ${words.length} ta so'zni eslab qoling va takrorlang
+            </p>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1rem; margin: 2rem 0;">
+                ${words.map(word => `
+                    <div style="background: rgba(255,255,255,0.1); padding: 1.5rem 1rem; border-radius: 12px; font-size: 1.1rem; border: 2px solid rgba(255,255,255,0.2); text-align: center;">
+                        ${word}
                     </div>
-                `;
+                `).join('')}
+            </div>
+            
+            <p id="countdown-text" style="font-size: 1rem; margin: 1.5rem 0;">
+                So'zlar ${displayTime/1000} soniyadan so'ng yopiladi...
+            </p>
+            
+            <button class="action-button primary" onclick="memoryMaster.startWordsInput(['${words.join("','")}'])" id="ready-btn" style="display: none; margin: 0 auto;">
+                <i class="fas fa-play"></i>
+                Tayyorman
+            </button>
+        </div>
+    `;
 
-                // Raqamlarni vaqtdan so'ng yashirish
-                setTimeout(() => {
-                    const numbers = document.querySelectorAll('.number-display-card');
-                    numbers.forEach(number => {
-                        number.style.visibility = 'hidden';
-                        number.innerHTML = '?';
-                    });
-                    document.getElementById('countdown-text').textContent = `Endi ${sequenceLength} ta raqamni ketma-ketlikda kiriting!`;
-                    document.getElementById('ready-btn').style.display = 'flex';
-                    
-                    // Ketma-ketlikni saqlash
-                    this.currentSequence = sequence;
-                }, displayTime);
-            }
+    // So'zlarni vaqtdan so'ng yashirish
+    setTimeout(() => {
+        const wordCards = document.querySelectorAll('.game-content > div > div > div');
+        wordCards.forEach(card => {
+            card.style.visibility = 'hidden';
+            card.innerHTML = '???';
+        });
+        document.getElementById('countdown-text').textContent = `Endi ${words.length} ta so'zni ketma-ketlikda kiriting!`;
+        document.getElementById('ready-btn').style.display = 'flex';
+        
+        // So'zlar ketma-ketligini saqlash
+        this.currentWords = words;
+    }, displayTime);
+}
 
-            generateRandomSequence(length) {
-                const sequence = [];
-                for (let i = 0; i < length; i++) {
-                    sequence.push(Math.floor(Math.random() * 9) + 1);
-                }
-                return sequence;
-            }
-
-            startNumbersInput(sequenceLength) {
-                const gameContent = document.getElementById('game-content');
-                gameContent.innerHTML = `
-                    <div class="numbers-game">
-                        <h3 style="font-size: 1.5rem; margin-bottom: 1.5rem;">Raqamlarni ketma-ketlikda kiriting</h3>
-                        
-                        <div class="input-display" id="input-display">
-                            ${this.currentSequence.map(() => `
-                                <div class="input-slot">?</div>
-                            `).join('')}
-                        </div>
-                        
-                        <div class="number-pad">
-                            ${[1,2,3,4,5,6,7,8,9].map(num => `
-                                <button class="number-btn" onclick="memoryMaster.addNumberInput(${num})">${num}</button>
-                            `).join('')}
-                        </div>
-                        
-                        <div class="game-controls">
-                            <button class="action-button secondary" onclick="memoryMaster.clearNumberInput()">
-                                <i class="fas fa-eraser"></i>
-                                Tozalash
-                            </button>
-                            <button class="action-button primary" onclick="memoryMaster.checkNumbersAnswer()">
-                                <i class="fas fa-check"></i>
-                                Tasdiqlash
-                            </button>
-                        </div>
+startWordsInput(words) {
+    const gameContent = document.getElementById('game-content');
+    gameContent.innerHTML = `
+        <div style="text-align: center; max-width: 600px; margin: 0 auto;">
+            <h3 style="font-size: 1.5rem; margin-bottom: 1.5rem;">So'zlarni ketma-ketlikda kiriting</h3>
+            
+            <div style="display: flex; flex-direction: column; gap: 1rem; margin: 2rem 0; max-width: 400px; margin-left: auto; margin-right: auto;">
+                ${words.map((_, index) => `
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <span style="color: var(--text-secondary); min-width: 30px;">${index + 1}.</span>
+                        <input type="text" class="word-input" data-index="${index}" 
+                               placeholder="So'zni kiriting..." 
+                               style="flex: 1; padding: 0.75rem 1rem; border: 2px solid rgba(255,255,255,0.2); 
+                                      border-radius: 8px; background: rgba(255,255,255,0.1); color: white; font-size: 1rem;">
                     </div>
-                `;
+                `).join('')}
+            </div>
+            
+            <div class="game-controls">
+                <button class="action-button secondary" onclick="memoryMaster.clearWordsInput()">
+                    <i class="fas fa-eraser"></i>
+                    Tozalash
+                </button>
+                <button class="action-button primary" onclick="memoryMaster.checkWordsAnswer()">
+                    <i class="fas fa-check"></i>
+                    Tasdiqlash
+                </button>
+            </div>
+        </div>
+    `;
 
-                this.userInput = [];
-                this.updateGameInfo(0, 1, '00:30');
-            }
+    this.userWordInput = [];
+    this.correctWords = words;
+    this.updateGameInfo(0, 1, '01:00');
+}
 
-            addNumberInput(number) {
-                if (this.userInput.length < this.currentSequence.length) {
-                    this.userInput.push(number);
-                    this.updateNumberInputDisplay();
-                }
-            }
+clearWordsInput() {
+    document.querySelectorAll('.word-input').forEach(input => {
+        input.value = '';
+    });
+    this.userWordInput = [];
+}
 
-            clearNumberInput() {
-                this.userInput = [];
-                this.updateNumberInputDisplay();
-            }
+checkWordsAnswer() {
+    let correct = true;
+    let score = 0;
 
-            updateNumberInputDisplay() {
-                const slots = document.querySelectorAll('.input-slot');
-                slots.forEach((slot, index) => {
-                    if (this.userInput[index]) {
-                        slot.textContent = this.userInput[index];
-                        slot.style.background = 'rgba(255,255,255,0.2)';
-                    } else {
-                        slot.textContent = '?';
-                        slot.style.background = 'rgba(255,255,255,0.1)';
-                    }
-                });
-            }
+    const inputs = document.querySelectorAll('.word-input');
+    this.userWordInput = [];
+    
+    inputs.forEach((input, index) => {
+        this.userWordInput.push(input.value.trim().toUpperCase());
+    });
 
-            checkNumbersAnswer() {
-                let correct = true;
-                let score = 0;
-
-                for (let i = 0; i < this.currentSequence.length; i++) {
-                    if (this.userInput[i] === this.currentSequence[i]) {
-                        score += 10;
-                    } else {
-                        correct = false;
-                        break;
-                    }
-                }
-
-                if (correct) {
-                    score += this.currentSequence.length * 5; // Bonus
-                    this.showResults(score, 1, '01:30', true);
-                } else {
-                    this.showResults(0, 1, '01:30', false);
-                }
-            }
-
-            showWordsGame(container) {
-                container.innerHTML = `
-                    <div style="text-align: center; padding: 3rem 1rem;">
-                        <h2 style="font-size: 1.75rem; margin-bottom: 1rem;">📝 So'zlar O'yini</h2>
-                        <p style="font-size: 1rem; color: var(--text-secondary); margin-bottom: 1.5rem;">
-                            Turli tillarda so'zlarni eslab qoling
-                        </p>
-                        <p style="font-size: 0.9rem; margin: 2rem 0;">Tez orada ishga tushadi! 🚀</p>
-                        <button class="action-button secondary" onclick="memoryMaster.showSection('dashboard-section')">
-                            <i class="fas fa-arrow-left"></i>
-                            Asosiy Menyuga Qaytish
-                        </button>
-                    </div>
-                `;
-            }
-
-            showFlashcardsGame(container) {
-                container.innerHTML = `
-                    <div style="text-align: center; padding: 3rem 1rem;">
-                        <h2 style="font-size: 1.75rem; margin-bottom: 1rem;">🎴 Flash Kartalar</h2>
-                        <p style="font-size: 1rem; color: var(--text-secondary); margin-bottom: 1.5rem;">
-                            Flashcardlar yordamida o'rganing
-                        </p>
-                        <p style="font-size: 0.9rem; margin: 2rem 0;">Tez orada ishga tushadi! 🌍</p>
-                        <button class="action-button secondary" onclick="memoryMaster.showSection('dashboard-section')">
-                            <i class="fas fa-arrow-left"></i>
-                            Asosiy Menyuga Qaytish
-                        </button>
-                    </div>
-                `;
-            }
-
-            showComingSoon(container, gameName) {
-                container.innerHTML = `
-                    <div style="text-align: center; padding: 3rem 1rem;">
-                        <div style="font-size: 3rem; margin-bottom: 1rem;">🚧</div>
-                        <h2 style="font-size: 1.75rem; margin-bottom: 1rem;">${gameName}</h2>
-                        <p style="font-size: 1rem; color: var(--text-secondary); margin-bottom: 1.5rem;">
-                            Ushbu o'yin hozircha ishlab chiqilmoqda
-                        </p>
-                        <p style="font-size: 0.9rem; margin: 2rem 0;">Iltimos, keyinroq qayta urinib ko'ring</p>
-                        <button class="action-button secondary" onclick="memoryMaster.showSection('dashboard-section')">
-                            <i class="fas fa-arrow-left"></i>
-                            Asosiy Menyuga Qaytish
-                        </button>
-                    </div>
-                `;
-            }
-
-            showResults(score, steps, time, isWin) {
-                this.showSection('results-section');
-                
-                // Update results
-                document.getElementById('final-score').textContent = score;
-                document.getElementById('final-steps').textContent = steps;
-                document.getElementById('final-time').textContent = time;
-                
-                const messageText = document.getElementById('result-message-text');
-                if (messageText) {
-                    if (isWin) {
-                        messageText.textContent = 'Tabriklaymiz! Ajoyib natija! 🎉';
-                        messageText.style.color = 'var(--success)';
-                    } else {
-                        messageText.textContent = 'Yaxshi urinish! Keyingi safar yaxshiroq natija ko\'rsatasiz! 💫';
-                        messageText.style.color = 'var(--danger)';
-                    }
-                }
-            }
-
-            showProfile() {
-                document.getElementById('profile-modal').classList.add('active');
-            }
-
-            hideProfile() {
-                document.getElementById('profile-modal').classList.remove('active');
-            }
+    for (let i = 0; i < this.correctWords.length; i++) {
+        if (this.userWordInput[i] === this.correctWords[i]) {
+            score += 15;
+        } else {
+            correct = false;
+            break;
         }
+    }
 
-        // App ni ishga tushirish
-        console.log('🚀 Starting Memory Master app...');
-        const memoryMaster = new MemoryMaster();
-        console.log('✅ Memory Master app started successfully!');
+    if (correct) {
+        score += this.correctWords.length * 8; // Bonus
+        this.showResults(score, 1, '01:30', true);
+    } else {
+        this.showResults(0, 1, '01:30', false);
+    }
+}
 
-        // Global access
-        window.memoryMaster = memoryMaster;
-    </script>
-</body>
-</html>
+showFlashcardsGame(container) {
+    console.log('🎴 Showing flashcards game');
+    
+    const flashcards = [
+        { front: "Hello", back: "Salom", pronunciation: "heˈləʊ", language: "🇺🇸 Ingliz" },
+        { front: "Thank you", back: "Rahmat", pronunciation: "θæŋk juː", language: "🇺🇸 Ingliz" },
+        { front: "Goodbye", back: "Xayr", pronunciation: "ɡʊdˈbaɪ", language: "🇺🇸 Ingliz" },
+        { front: "Please", back: "Iltimos", pronunciation: "pliːz", language: "🇺🇸 Ingliz" }
+    ];
+
+    container.innerHTML = `
+        <div style="text-align: center; max-width: 600px; margin: 0 auto;">
+            <h2 style="font-size: 1.75rem; margin-bottom: 1rem;">🎴 Flash Kartalar</h2>
+            <p style="font-size: 1rem; color: var(--text-secondary); margin-bottom: 2rem;">
+                Kartalarni aylantiring va so'zlarni o'rganing
+            </p>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin: 2rem 0;">
+                ${flashcards.map((card, index) => `
+                    <div class="flashcard" onclick="memoryMaster.flipCard(this)" 
+                         style="background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.2); 
+                                border-radius: 16px; padding: 2rem; cursor: pointer; transition: all 0.6s; 
+                                transform-style: preserve-3d; position: relative; min-height: 200px; display: flex; 
+                                align-items: center; justify-content: center;">
+                        <div class="card-front" style="position: absolute; backface-visibility: hidden; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem;">
+                            <div style="font-size: 1.5rem; font-weight: bold;">${card.front}</div>
+                            <div style="color: var(--text-secondary); font-size: 0.9rem;">${card.pronunciation}</div>
+                            <div style="color: var(--text-muted); font-size: 0.8rem;">${card.language}</div>
+                            <div style="font-size: 0.8rem; color: var(--primary); margin-top: 1rem;">
+                                <i class="fas fa-sync-alt"></i> Aylantirish uchun bosing
+                            </div>
+                        </div>
+                        <div class="card-back" style="position: absolute; backface-visibility: hidden; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; transform: rotateY(180deg);">
+                            <div style="font-size: 1.5rem; font-weight: bold; color: var(--secondary);">${card.back}</div>
+                            <div style="color: var(--text-secondary); font-size: 1rem;">${card.language}</div>
+                            <div style="font-size: 0.8rem; color: var(--primary); margin-top: 1rem;">
+                                <i class="fas fa-sync-alt"></i> Aylantirish uchun bosing
+                            </div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+            
+            <div style="margin-top: 2rem;">
+                <button class="action-button primary" onclick="memoryMaster.startFlashcardsTest()">
+                    <i class="fas fa-clipboard-check"></i>
+                    Testni Boshlash
+                </button>
+            </div>
+        </div>
+    `;
+
+    this.currentFlashcards = flashcards;
+}
+
+flipCard(card) {
+    card.style.transform = card.style.transform === 'rotateY(180deg)' ? 'rotateY(0deg)' : 'rotateY(180deg)';
+}
+
+startFlashcardsTest() {
+    const gameContent = document.getElementById('game-content');
+    const testQuestions = [...this.currentFlashcards];
+    
+    // Test variantlarini tayyorlash
+    const questions = testQuestions.map((card, index) => {
+        const wrongAnswers = this.currentFlashcards
+            .filter(c => c.back !== card.back)
+            .slice(0, 2)
+            .map(c => c.back);
+        
+        const options = [card.back, ...wrongAnswers].sort(() => Math.random() - 0.5);
+        
+        return {
+            question: card.front,
+            correctAnswer: card.back,
+            options: options,
+            pronunciation: card.pronunciation,
+            language: card.language
+        };
+    });
+
+    this.currentTest = {
+        questions: questions,
+        currentQuestion: 0,
+        score: 0
+    };
+
+    this.showFlashcardQuestion();
+}
+
+showFlashcardQuestion() {
+    if (this.currentTest.currentQuestion >= this.currentTest.questions.length) {
+        this.showFlashcardResults();
+        return;
+    }
+
+    const question = this.currentTest.questions[this.currentTest.currentQuestion];
+    const gameContent = document.getElementById('game-content');
+
+    gameContent.innerHTML = `
+        <div style="text-align: center; max-width: 500px; margin: 0 auto;">
+            <h3 style="font-size: 1.5rem; margin-bottom: 1rem;">Flashcard Testi</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 0.5rem;">
+                Savol ${this.currentTest.currentQuestion + 1}/${this.currentTest.questions.length}
+            </p>
+            
+            <div style="background: rgba(255,255,255,0.1); border-radius: 16px; padding: 2rem; margin: 2rem 0; border: 2px solid rgba(255,255,255,0.2);">
+                <div style="font-size: 2rem; font-weight: bold; margin-bottom: 1rem;">${question.question}</div>
+                <div style="color: var(--text-secondary); font-size: 1rem; margin-bottom: 0.5rem;">${question.pronunciation}</div>
+                <div style="color: var(--text-muted); font-size: 0.9rem;">${question.language}</div>
+            </div>
+            
+            <p style="margin-bottom: 1.5rem; font-size: 1rem;">"${question.question}" so'zining tarjimasini toping:</p>
+            
+            <div style="display: flex; flex-direction: column; gap: 1rem; margin: 2rem 0;">
+                ${question.options.map((option, optIndex) => `
+                    <button class="test-option" onclick="memoryMaster.selectFlashcardAnswer('${option}')"
+                            style="background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.2); 
+                                   color: white; padding: 1rem 1.5rem; border-radius: 12px; cursor: pointer; 
+                                   transition: all 0.3s; font-size: 1rem; text-align: left;">
+                        ${String.fromCharCode(65 + optIndex)}) ${option}
+                    </button>
+                `).join('')}
+            </div>
+        </div>
+    `;
+
+    this.updateGameInfo(this.currentTest.score, this.currentTest.currentQuestion + 1, '02:00');
+}
+
+selectFlashcardAnswer(selectedAnswer) {
+    const question = this.currentTest.questions[this.currentTest.currentQuestion];
+    const options = document.querySelectorAll('.test-option');
+    
+    options.forEach(option => {
+        option.style.pointerEvents = 'none';
+        const optionText = option.textContent.split(') ')[1];
+        
+        if (optionText === question.correctAnswer) {
+            option.style.background = 'rgba(34, 197, 94, 0.3)';
+            option.style.borderColor = 'var(--success)';
+        } else if (optionText === selectedAnswer && selectedAnswer !== question.correctAnswer) {
+            option.style.background = 'rgba(239, 68, 68, 0.3)';
+            option.style.borderColor = 'var(--danger)';
+        }
+    });
+
+    if (selectedAnswer === question.correctAnswer) {
+        this.currentTest.score += 25;
+    }
+
+    setTimeout(() => {
+        this.currentTest.currentQuestion++;
+        this.showFlashcardQuestion();
+    }, 1500);
+}
+
+showFlashcardResults() {
+    const totalScore = this.currentTest.score;
+    const maxScore = this.currentTest.questions.length * 25;
+    const percentage = (totalScore / maxScore) * 100;
+    
+    let message = '';
+    if (percentage >= 80) {
+        message = 'Ajoyib! Siz flashcardlarni mukammal o\'zlashtirdingiz! 🎉';
+    } else if (percentage >= 60) {
+        message = 'Yaxshi natija! Biroz mashq qilish kerak. 💪';
+    } else {
+        message = 'Qaytadan urinib ko\'ring, siz yaxshilashingiz mumkin! 📚';
+    }
+
+    this.showResults(totalScore, this.currentTest.questions.length, '03:00', percentage >= 60);
+}
+
+// ... qolgan kodlar o'zgarmaydi ...
