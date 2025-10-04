@@ -6,10 +6,775 @@
     <title>Memory Master - Aqlingizni Sinab Ko'ring</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --danger: #ef4444;
+            --success: #22c55e;
+            
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+            
+            --border-radius: 20px;
+            --border-radius-sm: 12px;
+            --shadow: 0 10px 25px rgba(0,0,0,0.3);
+            --shadow-lg: 0 25px 50px rgba(0,0,0,0.4);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, #1e1b4b 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* LOADING SCREEN */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading-screen.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-content {
+            text-align: center;
+        }
+
+        .brain-loader {
+            font-size: 4rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* BACKGROUND ANIMATION */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .floating-shapes .shape {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            opacity: 0.1;
+            animation: float 20s infinite linear;
+        }
+
+        .shape-1 { width: 200px; height: 200px; top: 10%; left: 5%; animation-delay: 0s; }
+        .shape-2 { width: 150px; height: 150px; top: 60%; right: 10%; animation-delay: -5s; }
+        .shape-3 { width: 100px; height: 100px; bottom: 20%; left: 20%; animation-delay: -10s; }
+        .shape-4 { width: 250px; height: 250px; top: 30%; right: 5%; animation-delay: -15s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-30px) rotate(120deg); }
+            66% { transform: translateY(30px) rotate(240deg); }
+        }
+
+        /* WELCOME MODAL */
+        #welcome-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .welcome-modal {
+            background: rgba(30, 41, 59, 0.9);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius);
+            padding: 3rem;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .welcome-icon {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2.5rem;
+        }
+
+        .welcome-modal h2 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .input-group {
+            margin: 2rem 0;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: var(--border-radius-sm);
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .welcome-btn {
+            width: 100%;
+            padding: 1.2rem 2rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .welcome-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        /* MAIN CONTAINER */
+        .main-container {
+            display: none;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+
+        /* HEADER */
+        .main-header {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo i {
+            font-size: 2rem;
+            color: var(--primary);
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .profile-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text-primary);
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+
+        .profile-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* SECTIONS */
+        section {
+            display: none;
+        }
+
+        section.active {
+            display: block;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* DASHBOARD SECTION */
+        .dashboard-section {
+            padding: 2rem 0;
+        }
+
+        .welcome-banner {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: var(--border-radius);
+            padding: 3rem 2rem;
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .welcome-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .welcome-banner h2 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            position: relative;
+        }
+
+        .welcome-banner p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            position: relative;
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .game-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius);
+            padding: 2.5rem 2rem;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .game-card:hover::before {
+            left: 100%;
+        }
+
+        .game-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(255, 255, 255, 0.3);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .game-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+
+        .game-content h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .game-content p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .game-stats {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .game-stats i {
+            margin-right: 0.25rem;
+        }
+
+        .game-badge {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: var(--secondary);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .game-badge.premium {
+            background: linear-gradient(135deg, var(--accent), #eab308);
+        }
+
+        /* GAME AREA */
+        .game-area-section {
+            padding: 1rem 0;
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: var(--border-radius);
+            backdrop-filter: blur(10px);
+        }
+
+        .back-button {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text-primary);
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .game-info {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .info-item i {
+            color: var(--primary);
+        }
+
+        .info-item strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .game-content {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius);
+            padding: 3rem;
+            min-height: 500px;
+        }
+
+        /* RESULTS SECTION */
+        .results-section {
+            padding: 2rem 0;
+            display: none;
+        }
+
+        .results-section.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .results-container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius);
+            padding: 3rem;
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .results-header {
+            margin-bottom: 2rem;
+        }
+
+        .result-icon {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, var(--success), #16a34a);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2.5rem;
+        }
+
+        .results-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1.5rem 1rem;
+            border-radius: var(--border-radius);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .results-message {
+            margin-bottom: 2rem;
+        }
+
+        .results-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .action-button {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: var(--transition);
+        }
+
+        .action-button.primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+
+        .action-button.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        /* PROFILE MODAL */
+        #profile-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+        }
+
+        #profile-modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            padding: 0;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-header h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .close-modal:hover {
+            color: var(--text-primary);
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .profile-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+
+        .user-details h4 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .user-details p {
+            color: var(--text-secondary);
+        }
+
+        .profile-stats h4 {
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        .stat {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem 1rem;
+            border-radius: var(--border-radius-sm);
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* RESPONSIVE DESIGN */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 1rem;
+            }
+            
+            .games-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .game-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .game-info {
+                gap: 1rem;
+            }
+            
+            .results-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .results-actions {
+                flex-direction: column;
+            }
+            
+            .welcome-banner h2 {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .logo h1 {
+                font-size: 1.25rem;
+            }
+            
+            .modal-content {
+                width: 95%;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
-    <!-- Loading Screen -->
+    <!-- BACKGROUND ANIMATION -->
+    <div class="bg-animation">
+        <div class="floating-shapes">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+            <div class="shape shape-3"></div>
+            <div class="shape shape-4"></div>
+        </div>
+    </div>
+
+    <!-- LOADING SCREEN -->
     <div id="loading" class="loading-screen">
         <div class="loading-content">
             <div class="brain-loader">
@@ -20,18 +785,28 @@
         </div>
     </div>
 
-    <!-- Main Container -->
-    <div class="main-container">
-        <!-- Background Animation -->
-        <div class="bg-animation">
-            <div class="floating-shapes">
-                <div class="shape shape-1"></div>
-                <div class="shape shape-2"></div>
-                <div class="shape shape-3"></div>
-                <div class="shape shape-4"></div>
+    <!-- WELCOME MODAL -->
+    <div id="welcome-modal">
+        <div class="welcome-modal">
+            <div class="welcome-icon">
+                <i class="fas fa-brain"></i>
             </div>
+            <h2>Memory Master ga Xush Kelibsiz!</h2>
+            <p>O'yinga kirish uchun ismingizni kiriting</p>
+            
+            <div class="input-group">
+                <input type="text" id="user-name-input" placeholder="Ismingizni kiriting..." maxlength="20">
+            </div>
+            
+            <button id="start-game-btn" class="welcome-btn">
+                <i class="fas fa-play"></i>
+                O'yinni Boshlash
+            </button>
         </div>
+    </div>
 
+    <!-- MAIN CONTAINER -->
+    <div class="main-container">
         <!-- Header -->
         <header class="main-header">
             <div class="header-content">
@@ -50,141 +825,112 @@
 
         <!-- Main Content -->
         <main class="main-content">
-            <!-- Welcome Section -->
-            <section id="welcome-section" class="welcome-section active">
-                <div class="welcome-content">
-                    <div class="welcome-text">
-                        <h2>Xush kelibsiz, <span class="highlight">Memory Master</span>!</h2>
-                        <p>Aqlingizning chegaralarini sinab ko'ring va xotirangizni kuchaytiring. Turli o'yinlar orqali miyangizni mashq qiling.</p>
-                        <div class="stats-preview">
-                            <div class="stat-item">
-                                <i class="fas fa-gamepad"></i>
-                                <span>5+ O'yin turi</span>
-                            </div>
-                            <div class="stat-item">
-                                <i class="fas fa-chart-line"></i>
-                                <span>Darajali tizim</span>
-                            </div>
-                            <div class="stat-item">
-                                <i class="fas fa-trophy"></i>
-                                <span>Yutuqlar</span>
-                            </div>
-                        </div>
-                        <button id="start-btn" class="cta-button">
-                            Boshlash
-                            <i class="fas fa-arrow-right"></i>
-                        </button>
-                    </div>
-                    <div class="welcome-visual">
-                        <div class="floating-cards">
-                            <div class="card card-1"><i class="fas fa-1"></i></div>
-                            <div class="card card-2"><i class="fas fa-2"></i></div>
-                            <div class="card card-3"><i class="fas fa-3"></i></div>
-                            <div class="card card-4"><i class="fas fa-a"></i></div>
-                            <div class="card card-5"><i class="fas fa-b"></i></div>
-                            <div class="card card-6"><i class="fas fa-c"></i></div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Game Modes Section -->
-            <section id="game-modes" class="game-modes-section">
-                <div class="section-header">
-                    <h2>O'yin Rejimlari</h2>
-                    <p>Quyidagi o'yinlardan birini tanlang va boshlang</p>
+            <!-- Dashboard Section -->
+            <section id="dashboard-section" class="dashboard-section active">
+                <div class="welcome-banner">
+                    <h2>Xush kelibsiz, <span id="welcome-name">Foydalanuvchi</span>!</h2>
+                    <p>Aqlingizning chegaralarini sinab ko'ring va xotirangizni kuchaytiring</p>
                 </div>
                 
-                <div class="modes-grid">
-                    <!-- Numbers Game -->
-                    <div class="mode-card" data-mode="numbers">
-                        <div class="mode-icon">
+                <div class="games-grid">
+                    <!-- Raqamlar -->
+                    <div class="game-card" data-game="numbers">
+                        <div class="game-icon">
                             <i class="fas fa-sort-numeric-up"></i>
                         </div>
-                        <div class="mode-content">
+                        <div class="game-content">
                             <h3>Raqamlar</h3>
-                            <p>Raqamlar ketma-ketligini eslab qoling va takrorlang</p>
-                            <div class="mode-stats">
-                                <span><i class="fas fa-fire"></i> Daraja: 5</span>
+                            <p>Raqamlarni eslab qolishni mashq qiling</p>
+                            <div class="game-stats">
+                                <span><i class="fas fa-fire"></i> 5 daraja</span>
                                 <span><i class="fas fa-clock"></i> 2-5 daqiqa</span>
                             </div>
                         </div>
-                        <div class="mode-badge">Mashq</div>
+                        <div class="game-badge">Mashq</div>
                     </div>
 
-                    <!-- Words Game -->
-                    <div class="mode-card" data-mode="words">
-                        <div class="mode-icon">
+                    <!-- So'zlar -->
+                    <div class="game-card" data-game="words">
+                        <div class="game-icon">
                             <i class="fas fa-font"></i>
                         </div>
-                        <div class="mode-content">
+                        <div class="game-content">
                             <h3>So'zlar</h3>
-                            <p>So'zlar ketma-ketligini eslab qoling va takrorlang</p>
-                            <div class="mode-stats">
-                                <span><i class="fas fa-fire"></i> Daraja: 5</span>
+                            <p>Turli tillarda so'zlarni eslab qoling</p>
+                            <div class="game-stats">
+                                <span><i class="fas fa-fire"></i> 6 til</span>
                                 <span><i class="fas fa-clock"></i> 3-6 daqiqa</span>
                             </div>
                         </div>
-                        <div class="mode-badge">Mashq</div>
+                        <div class="game-badge">Mashq</div>
                     </div>
 
                     <!-- Flashcards -->
-                    <div class="mode-card" data-mode="flashcards">
-                        <div class="mode-icon">
+                    <div class="game-card" data-game="flashcards">
+                        <div class="game-icon">
                             <i class="fas fa-layer-group"></i>
                         </div>
-                        <div class="mode-content">
-                            <h3>Flash Kartalar</h3>
-                            <p>6 xil tilda so'zlarni o'rganing va yodlang</p>
-                            <div class="mode-stats">
+                        <div class="game-content">
+                            <h3>Flashcards</h3>
+                            <p>Flashcardlar yordamida o'rganing</p>
+                            <div class="game-stats">
                                 <span><i class="fas fa-fire"></i> 1500+ so'z</span>
                                 <span><i class="fas fa-clock"></i> Cheksiz</span>
                             </div>
                         </div>
-                        <div class="mode-badge premium">
+                        <div class="game-badge premium">
                             <i class="fas fa-crown"></i>
                             Premium
                         </div>
                     </div>
 
-                    <!-- Faces Game -->
-                    <div class="mode-card" data-mode="faces">
-                        <div class="mode-icon">
+                    <!-- Yuz va Ismlar -->
+                    <div class="game-card" data-game="faces">
+                        <div class="game-icon">
                             <i class="fas fa-user-friends"></i>
                         </div>
-                        <div class="mode-content">
-                            <h3>Yuzlar</h3>
-                            <p>Yuzlarni eslab qoling va ularni tanib oling</p>
-                            <div class="mode-stats">
-                                <span><i class="fas fa-fire"></i> Daraja: 3</span>
+                        <div class="game-content">
+                            <h3>Yuz va Ismlar</h3>
+                            <p>Yuzlar va ismlarni eslab qoling</p>
+                            <div class="game-stats">
+                                <span><i class="fas fa-fire"></i> 3 daraja</span>
                                 <span><i class="fas fa-clock"></i> 4 daqiqa</span>
                             </div>
                         </div>
-                        <div class="mode-badge">Yangi</div>
+                        <div class="game-badge">Yangi</div>
                     </div>
 
-                    <!-- Images Game -->
-                    <div class="mode-card" data-mode="images">
-                        <div class="mode-icon">
+                    <!-- Rasmlar -->
+                    <div class="game-card" data-game="images">
+                        <div class="game-icon">
                             <i class="fas fa-images"></i>
                         </div>
-                        <div class="mode-content">
-                            <h3>Rasmlar</h3>
-                            <p>Rasmlar ketma-ketligini eslab qoling va takrorlang</p>
-                            <div class="mode-stats">
-                                <span><i class="fas fa-fire"></i> Daraja: 4</span>
+                        <div class="game-content">
+                            <h3>Rasmlar Sahifasi</h3>
+                            <p>Rasmlarni eslab qolishni o'rganing</p>
+                            <div class="game-stats">
+                                <span><i class="fas fa-fire"></i> 4 daraja</span>
                                 <span><i class="fas fa-clock"></i> 3-5 daqiqa</span>
                             </div>
                         </div>
-                        <div class="mode-badge">Yangi</div>
+                        <div class="game-badge">Yangi</div>
                     </div>
-                </div>
 
-                <div class="section-footer">
-                    <button id="back-to-welcome" class="back-button">
-                        <i class="fas fa-arrow-left"></i>
-                        Orqaga
-                    </button>
+                    <!-- Natijalar -->
+                    <div class="game-card" data-game="results">
+                        <div class="game-icon">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                        <div class="game-content">
+                            <h3>Mening Natijalarim</h3>
+                            <p>O'yinga kirish uchun ismingizni kiriting</p>
+                            <div class="game-stats">
+                                <span><i class="fas fa-trophy"></i> Statistika</span>
+                                <span><i class="fas fa-chart-line"></i> Progress</span>
+                            </div>
+                        </div>
+                        <div class="game-badge">Hisobot</div>
+                    </div>
                 </div>
             </section>
 
@@ -193,7 +939,7 @@
                 <div class="game-header">
                     <button id="game-back-btn" class="back-button">
                         <i class="fas fa-arrow-left"></i>
-                        Menyuga qaytish
+                        Asosiy menyuga qaytish
                     </button>
                     <div class="game-info">
                         <div class="info-item">
@@ -212,7 +958,13 @@
                 </div>
 
                 <div id="game-content" class="game-content">
-                    <!-- Game content will be loaded here dynamically -->
+                    <!-- Game content will be loaded here -->
+                    <div style="text-align: center; padding: 4rem 2rem;">
+                        <h3 style="font-size: 2rem; margin-bottom: 1rem;">O'yinni tanlang</h3>
+                        <p style="font-size: 1.2rem; color: var(--text-secondary);">
+                            Asosiy menyudan o'yin tanlang va boshlang
+                        </p>
+                    </div>
                 </div>
             </section>
 
@@ -242,7 +994,7 @@
                     </div>
 
                     <div class="results-message">
-                        <p id="result-message-text">Ajoyib natija! Siz a'lo darajada o'ynadingiz.</p>
+                        <p id="result-message-text" style="font-size: 1.1rem;">Ajoyib natija! Siz a'lo darajada o'ynadingiz.</p>
                     </div>
 
                     <div class="results-actions">
@@ -250,48 +1002,48 @@
                             <i class="fas fa-redo"></i>
                             Yana O'ynash
                         </button>
-                        <button id="back-to-modes-btn" class="action-button secondary">
+                        <button id="back-to-dashboard-btn" class="action-button secondary">
                             <i class="fas fa-th-large"></i>
-                            Boshqa O'yin
+                            Asosiy Menyu
                         </button>
                     </div>
                 </div>
             </section>
         </main>
+    </div>
 
-        <!-- Profile Modal -->
-        <div id="profile-modal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>Foydalanuvchi Profili</h3>
-                    <button class="close-modal">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <div class="profile-info">
-                        <div class="avatar">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <div class="user-details">
-                            <h4 id="user-name">Mehmon Foydalanuvchi</h4>
-                            <p>Memory Master</p>
-                        </div>
+    <!-- Profile Modal -->
+    <div id="profile-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Foydalanuvchi Profili</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="profile-info">
+                    <div class="avatar">
+                        <i class="fas fa-user"></i>
                     </div>
-                    
-                    <div class="profile-stats">
-                        <h4>Statistika</h4>
-                        <div class="stats-grid">
-                            <div class="stat">
-                                <div class="stat-number">0</div>
-                                <div class="stat-label">O'ynalgan o'yinlar</div>
-                            </div>
-                            <div class="stat">
-                                <div class="stat-number">0</div>
-                                <div class="stat-label">Yutuqlar</div>
-                            </div>
-                            <div class="stat">
-                                <div class="stat-number">0</div>
-                                <div class="stat-label">Eng yuqori ball</div>
-                            </div>
+                    <div class="user-details">
+                        <h4 id="profile-user-name">Foydalanuvchi</h4>
+                        <p>Memory Master</p>
+                    </div>
+                </div>
+                
+                <div class="profile-stats">
+                    <h4>Statistika</h4>
+                    <div class="stats-grid">
+                        <div class="stat">
+                            <div class="stat-number">0</div>
+                            <div class="stat-label">O'ynalgan o'yinlar</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">0</div>
+                            <div class="stat-label">Yutuqlar</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">0</div>
+                            <div class="stat-label">Eng yuqori ball</div>
                         </div>
                     </div>
                 </div>
@@ -299,17 +1051,369 @@
         </div>
     </div>
 
-    <!-- Script Files -->
-    <script src="data.js"></script>
-    <script src="utils/storage.js"></script>
-    <script src="utils/helpers.js"></script>
-    <script src="modules/numbers.js"></script>
-    <script src="modules/words.js"></script>
-    <script src="modules/flashcards.js"></script>
-    <script src="modules/faces.js"></script>
-    <script src="modules/images.js"></script>
-    <script src="profiles/user.js"></script>
-    <script src="profiles/stats.js"></script>
-    <script src="app.js"></script>
+    <script>
+        // MEMORY MASTER APP
+        console.log('🧠 Memory Master - App Starting...');
+
+        class MemoryMaster {
+            constructor() {
+                this.userName = '';
+                this.currentGame = null;
+                this.init();
+            }
+
+            init() {
+                console.log('🎮 Initializing Memory Master...');
+                this.setupEventListeners();
+                this.hideLoadingScreen();
+            }
+
+            setupEventListeners() {
+                console.log('🔗 Setting up event listeners...');
+                
+                // Welcome modal
+                document.getElementById('start-game-btn').addEventListener('click', () => {
+                    this.startGame();
+                });
+
+                // Game cards
+                document.querySelectorAll('.game-card').forEach(card => {
+                    card.addEventListener('click', (e) => {
+                        const game = e.currentTarget.dataset.game;
+                        this.startGameMode(game);
+                    });
+                });
+
+                // Back buttons
+                document.getElementById('game-back-btn').addEventListener('click', () => {
+                    this.showSection('dashboard-section');
+                });
+
+                document.getElementById('back-to-dashboard-btn').addEventListener('click', () => {
+                    this.showSection('dashboard-section');
+                });
+
+                // Profile button
+                document.getElementById('profile-btn').addEventListener('click', () => {
+                    this.showProfile();
+                });
+
+                document.querySelector('.close-modal').addEventListener('click', () => {
+                    this.hideProfile();
+                });
+
+                // Results buttons
+                document.getElementById('play-again-btn').addEventListener('click', () => {
+                    if (this.currentGame) {
+                        this.startGameMode(this.currentGame);
+                    } else {
+                        this.showSection('dashboard-section');
+                    }
+                });
+            }
+
+            hideLoadingScreen() {
+                setTimeout(() => {
+                    document.getElementById('loading').classList.add('fade-out');
+                    setTimeout(() => {
+                        document.getElementById('loading').style.display = 'none';
+                    }, 500);
+                }, 2000);
+            }
+
+            startGame() {
+                const nameInput = document.getElementById('user-name-input').value.trim();
+                
+                if (!nameInput) {
+                    alert('Iltimos, ismingizni kiriting!');
+                    return;
+                }
+
+                this.userName = nameInput;
+                console.log('👤 User name:', this.userName);
+                
+                // Welcome modalni yopish
+                document.getElementById('welcome-modal').style.display = 'none';
+                
+                // Asosiy app ni ko'rsatish
+                document.querySelector('.main-container').style.display = 'flex';
+                
+                // Foydalanuvchi nomini yangilash
+                document.getElementById('welcome-name').textContent = this.userName;
+                document.getElementById('profile-user-name').textContent = this.userName;
+                
+                // Dashboard sectionni ko'rsatish
+                this.showSection('dashboard-section');
+            }
+
+            showSection(sectionId) {
+                console.log('📱 Showing section:', sectionId);
+                
+                // Barcha sectionlarni yashirish
+                document.querySelectorAll('section').forEach(section => {
+                    section.style.display = 'none';
+                    section.classList.remove('active');
+                });
+                
+                // Tanlangan sectionni ko'rsatish
+                const targetSection = document.getElementById(sectionId);
+                if (targetSection) {
+                    targetSection.style.display = 'block';
+                    setTimeout(() => {
+                        targetSection.classList.add('active');
+                    }, 50);
+                }
+            }
+
+            startGameMode(gameType) {
+                console.log('🚀 Starting game mode:', gameType);
+                this.currentGame = gameType;
+                this.showSection('game-area');
+                
+                const gameContent = document.getElementById('game-content');
+                
+                // Reset game info
+                this.updateGameInfo(0, 0, '00:00');
+
+                switch(gameType) {
+                    case 'numbers':
+                        this.showNumbersGame(gameContent);
+                        break;
+                    case 'words':
+                        this.showWordsGame(gameContent);
+                        break;
+                    case 'flashcards':
+                        this.showFlashcardsGame(gameContent);
+                        break;
+                    case 'faces':
+                        this.showComingSoon(gameContent, 'Yuz va Ismlar O\'yini');
+                        break;
+                    case 'images':
+                        this.showComingSoon(gameContent, 'Rasmlar O\'yini');
+                        break;
+                    case 'results':
+                        this.showComingSoon(gameContent, 'Mening Natijalarim');
+                        break;
+                    default:
+                        this.showComingSoon(gameContent, 'Bu O\'yin');
+                }
+            }
+
+            updateGameInfo(score, steps, time) {
+                document.getElementById('current-score').textContent = score;
+                document.getElementById('current-step').textContent = steps;
+                document.getElementById('game-timer').textContent = time;
+            }
+
+            showNumbersGame(container) {
+                console.log('🔢 Showing numbers game');
+                
+                container.innerHTML = `
+                    <div style="text-align: center; max-width: 600px; margin: 0 auto;">
+                        <h2 style="font-size: 2.5rem; margin-bottom: 1rem;">🔢 Raqamlar O'yini</h2>
+                        <p style="font-size: 1.2rem; color: var(--text-secondary); margin-bottom: 3rem;">
+                            Raqamlar ketma-ketligini eslab qoling va takrorlang
+                        </p>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 1rem; margin: 3rem 0;">
+                            <div style="background: rgba(255,255,255,0.1); padding: 2rem; border-radius: 16px; font-size: 2rem; border: 2px solid rgba(255,255,255,0.2);">7</div>
+                            <div style="background: rgba(255,255,255,0.1); padding: 2rem; border-radius: 16px; font-size: 2rem; border: 2px solid rgba(255,255,255,0.2);">2</div>
+                            <div style="background: rgba(255,255,255,0.1); padding: 2rem; border-radius: 16px; font-size: 2rem; border: 2px solid rgba(255,255,255,0.2);">9</div>
+                        </div>
+                        
+                        <p id="countdown-text" style="font-size: 1.1rem; margin: 2rem 0;">
+                            Raqamlar 3 soniyadan so'ng yopiladi...
+                        </p>
+                        
+                        <button class="action-button primary" onclick="memoryMaster.startNumbersInput()" id="ready-btn" style="display: none; margin: 0 auto;">
+                            <i class="fas fa-play"></i>
+                            Tayyorman
+                        </button>
+                    </div>
+                `;
+
+                // Raqamlarni 3 soniyadan so'ng yashirish
+                setTimeout(() => {
+                    const numbers = document.querySelectorAll('.game-content > div > div > div');
+                    numbers.forEach(number => {
+                        number.style.visibility = 'hidden';
+                        number.innerHTML = '?';
+                    });
+                    document.getElementById('countdown-text').textContent = 'Endi raqamlarni ketma-ketlikda kiriting!';
+                    document.getElementById('ready-btn').style.display = 'flex';
+                }, 3000);
+            }
+
+            startNumbersInput() {
+                const gameContent = document.getElementById('game-content');
+                gameContent.innerHTML = `
+                    <div style="text-align: center; max-width: 600px; margin: 0 auto;">
+                        <h3 style="font-size: 2rem; margin-bottom: 2rem;">Raqamlarni ketma-ketlikda kiriting</h3>
+                        
+                        <div style="display: flex; gap: 1rem; justify-content: center; margin: 3rem 0; flex-wrap: wrap;">
+                            <div style="width: 80px; height: 80px; background: rgba(255,255,255,0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; border: 2px solid rgba(255,255,255,0.3);">?</div>
+                            <div style="width: 80px; height: 80px; background: rgba(255,255,255,0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; border: 2px solid rgba(255,255,255,0.3);">?</div>
+                            <div style="width: 80px; height: 80px; background: rgba(255,255,255,0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; border: 2px solid rgba(255,255,255,0.3);">?</div>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; max-width: 250px; margin: 0 auto;">
+                            ${[1,2,3,4,5,6,7,8,9].map(num => `
+                                <button class="number-btn" onclick="memoryMaster.addNumberInput(${num})" 
+                                        style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 1rem; border-radius: 8px; cursor: pointer; font-size: 1.2rem; transition: all 0.3s;">
+                                    ${num}
+                                </button>
+                            `).join('')}
+                        </div>
+                        
+                        <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem;">
+                            <button class="action-button secondary" onclick="memoryMaster.clearNumberInput()">
+                                <i class="fas fa-eraser"></i>
+                                Tozalash
+                            </button>
+                            <button class="action-button primary" onclick="memoryMaster.checkNumbersAnswer()">
+                                <i class="fas fa-check"></i>
+                                Tasdiqlash
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                this.userInput = [];
+                this.correctSequence = [7, 2, 9];
+                this.updateGameInfo(0, 1, '00:30');
+            }
+
+            addNumberInput(number) {
+                if (this.userInput.length < 3) {
+                    this.userInput.push(number);
+                    this.updateNumberInputDisplay();
+                }
+            }
+
+            clearNumberInput() {
+                this.userInput = [];
+                this.updateNumberInputDisplay();
+            }
+
+            updateNumberInputDisplay() {
+                const slots = document.querySelectorAll('.game-content > div > div > div');
+                slots.forEach((slot, index) => {
+                    if (this.userInput[index]) {
+                        slot.textContent = this.userInput[index];
+                        slot.style.background = 'rgba(255,255,255,0.2)';
+                    } else {
+                        slot.textContent = '?';
+                        slot.style.background = 'rgba(255,255,255,0.1)';
+                    }
+                });
+            }
+
+            checkNumbersAnswer() {
+                let correct = true;
+                let score = 0;
+
+                for (let i = 0; i < 3; i++) {
+                    if (this.userInput[i] === this.correctSequence[i]) {
+                        score += 10;
+                    } else {
+                        correct = false;
+                        break;
+                    }
+                }
+
+                if (correct) {
+                    score += 50; // Bonus
+                    this.showResults(score, 1, '01:30', true);
+                } else {
+                    this.showResults(0, 1, '01:30', false);
+                }
+            }
+
+            showWordsGame(container) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 4rem 2rem;">
+                        <h2 style="font-size: 2.5rem; margin-bottom: 1rem;">📝 So'zlar O'yini</h2>
+                        <p style="font-size: 1.2rem; color: var(--text-secondary); margin-bottom: 2rem;">
+                            Turli tillarda so'zlarni eslab qoling
+                        </p>
+                        <p style="font-size: 1.1rem; margin: 3rem 0;">Tez orada ishga tushadi! 🚀</p>
+                        <button class="action-button secondary" onclick="memoryMaster.showSection('dashboard-section')">
+                            <i class="fas fa-arrow-left"></i>
+                            Asosiy Menyuga Qaytish
+                        </button>
+                    </div>
+                `;
+            }
+
+            showFlashcardsGame(container) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 4rem 2rem;">
+                        <h2 style="font-size: 2.5rem; margin-bottom: 1rem;">🎴 Flash Kartalar</h2>
+                        <p style="font-size: 1.2rem; color: var(--text-secondary); margin-bottom: 2rem;">
+                            Flashcardlar yordamida o'rganing
+                        </p>
+                        <p style="font-size: 1.1rem; margin: 3rem 0;">Tez orada ishga tushadi! 🌍</p>
+                        <button class="action-button secondary" onclick="memoryMaster.showSection('dashboard-section')">
+                            <i class="fas fa-arrow-left"></i>
+                            Asosiy Menyuga Qaytish
+                        </button>
+                    </div>
+                `;
+            }
+
+            showComingSoon(container, gameName) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 4rem 2rem;">
+                        <div style="font-size: 4rem; margin-bottom: 1rem;">🚧</div>
+                        <h2 style="font-size: 2.5rem; margin-bottom: 1rem;">${gameName}</h2>
+                        <p style="font-size: 1.2rem; color: var(--text-secondary); margin-bottom: 2rem;">
+                            Ushbu o'yin hozircha ishlab chiqilmoqda
+                        </p>
+                        <p style="font-size: 1.1rem; margin: 3rem 0;">Iltimos, keyinroq qayta urinib ko'ring</p>
+                        <button class="action-button secondary" onclick="memoryMaster.showSection('dashboard-section')">
+                            <i class="fas fa-arrow-left"></i>
+                            Asosiy Menyuga Qaytish
+                        </button>
+                    </div>
+                `;
+            }
+
+            showResults(score, steps, time, isWin) {
+                this.showSection('results-section');
+                
+                // Update results
+                document.getElementById('final-score').textContent = score;
+                document.getElementById('final-steps').textContent = steps;
+                document.getElementById('final-time').textContent = time;
+                
+                const messageText = document.getElementById('result-message-text');
+                if (messageText) {
+                    if (isWin) {
+                        messageText.textContent = 'Tabriklaymiz! Ajoyib natija! 🎉';
+                        messageText.style.color = 'var(--success)';
+                    } else {
+                        messageText.textContent = 'Yaxshi urinish! Keyingi safar yaxshiroq natija ko\'rsatasiz! 💫';
+                        messageText.style.color = 'var(--danger)';
+                    }
+                }
+            }
+
+            showProfile() {
+                document.getElementById('profile-modal').classList.add('active');
+            }
+
+            hideProfile() {
+                document.getElementById('profile-modal').classList.remove('active');
+            }
+        }
+
+        // App ni ishga tushirish
+        console.log('🚀 Starting Memory Master app...');
+        const memoryMaster = new MemoryMaster();
+        console.log('✅ Memory Master app started successfully!');
+
+        // Global access
+        window.memoryMaster = memoryMaster;
+    </script>
 </body>
 </html>
