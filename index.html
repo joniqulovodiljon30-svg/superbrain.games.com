@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Master - Mnemonika O'yini</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-content">
+            <div class="brain-icon">
+                <i class="fas fa-brain"></i>
+            </div>
+            <h2>Memory Master</h2>
+            <p>Xotirani rivojlantirish o'yini</p>
+            <div class="loading-bar">
+                <div class="loading-progress"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App Container -->
+    <div id="app" class="app-container">
+        <!-- Profile Section -->
+        <div id="profile-section" class="section active">
+            <header class="profile-header">
+                <div class="profile-avatar">
+                    <img id="profile-image" src="" alt="Profil rasmi">
+                    <div class="avatar-overlay">
+                        <i class="fas fa-camera"></i>
+                    </div>
+                    <input type="file" id="avatar-upload" accept="image/*" style="display: none;">
+                </div>
+                <h1 id="profile-name">Foydalanuvchi</h1>
+                <p class="profile-stats">
+                    <span id="total-score">0</span> ball • 
+                    <span id="games-played">0</span> o'yin
+                </p>
+            </header>
+
+            <div class="games-grid">
+                <div class="game-card" data-game="numbers">
+                    <div class="game-icon">
+                        <i class="fas fa-sort-numeric-down"></i>
+                    </div>
+                    <h3>Raqamlar</h3>
+                    <p>Raqamlarni eslab qolishni mashq qiling</p>
+                    <div class="game-stats">
+                        <span>Eng yaxshi: <strong id="numbers-best">0</strong></span>
+                    </div>
+                </div>
+
+                <div class="game-card" data-game="words">
+                    <div class="game-icon">
+                        <i class="fas fa-font"></i>
+                    </div>
+                    <h3>So'zlar</h3>
+                    <p>Turli tillarda so'zlarni eslab qoling</p>
+                    <div class="game-stats">
+                        <span>Eng yaxshi: <strong id="words-best">0</strong></span>
+                    </div>
+                </div>
+
+                <div class="game-card" data-game="flashcards">
+                    <div class="game-icon">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <h3>Flashcards</h3>
+                    <p>Flashcardlar yordamida o'rganing</p>
+                    <div class="game-stats">
+                        <span>Kartalar: <strong id="flashcards-count">0</strong></span>
+                    </div>
+                </div>
+
+                <div class="game-card" data-game="faces">
+                    <div class="game-icon">
+                        <i class="fas fa-user-friends"></i>
+                    </div>
+                    <h3>Yuz va Ismlar</h3>
+                    <p>Yuzlar va ismlarni eslab qoling</p>
+                    <div class="game-stats">
+                        <span>Eng yaxshi: <strong id="faces-best">0</strong></span>
+                    </div>
+                </div>
+
+                <div class="game-card" data-game="images">
+                    <div class="game-icon">
+                        <i class="fas fa-images"></i>
+                    </div>
+                    <h3>Rasmlar Sahifasi</h3>
+                    <p>Rasmlarni eslab qolishni o'rganing</p>
+                    <div class="game-stats">
+                        <span>Eng yaxshi: <strong id="images-best">0</strong></span>
+                    </div>
+                </div>
+
+                <div class="game-card" data-game="results">
+                    <div class="game-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Mening Natijalarim</h3>
+                    <p>Barcha testlar natijalaringizni ko'ring</p>
+                    <div class="game-stats">
+                        <span>Jami: <strong id="total-games">0</strong> test</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Numbers Game Section -->
+        <div id="numbers-section" class="section">
+            <div class="game-header">
+                <button class="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h2>Raqamlar O'yini</h2>
+            </div>
+
+            <div class="game-content">
+                <!-- Settings Screen -->
+                <div id="numbers-settings" class="settings-screen">
+                    <div class="setting-group">
+                        <label>Raqamlar soni:</label>
+                        <input type="number" id="numbers-count" min="3" max="50" value="10">
+                    </div>
+                    <div class="setting-group">
+                        <label>Eslab qolish vaqti (soniya):</label>
+                        <input type="number" id="numbers-time" min="5" max="300" value="30">
+                    </div>
+                    <button id="start-numbers" class="start-btn">Boshlash</button>
+                </div>
+
+                <!-- Display Screen -->
+                <div id="numbers-display" class="display-screen">
+                    <div class="timer" id="numbers-timer">30</div>
+                    <div class="numbers-grid" id="numbers-grid"></div>
+                </div>
+
+                <!-- Input Screen -->
+                <div id="numbers-input" class="input-screen">
+                    <h3>Raqamlarni eslab qoling</h3>
+                    <div class="input-grid" id="numbers-input-grid"></div>
+                    <button id="check-numbers" class="check-btn">Tekshirish</button>
+                </div>
+
+                <!-- Results Screen -->
+                <div id="numbers-results" class="results-screen">
+                    <h3>Natijalar</h3>
+                    <div class="score-display">
+                        <div class="score-circle">
+                            <span id="numbers-score">0</span>
+                            <small>ball</small>
+                        </div>
+                    </div>
+                    <div class="results-comparison" id="numbers-comparison"></div>
+                    <div class="action-buttons">
+                        <button class="home-btn">Bosh Sahifa</button>
+                        <button class="retry-btn">Qayta O'ynash</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Words Game Section -->
+        <div id="words-section" class="section">
+            <div class="game-header">
+                <button class="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h2>So'zlar O'yini</h2>
+            </div>
+
+            <div class="game-content">
+                <!-- Settings Screen -->
+                <div id="words-settings" class="settings-screen">
+                    <div class="setting-group">
+                        <label>Til:</label>
+                        <select id="words-language">
+                            <option value="english">Inglizcha</option>
+                            <option value="korean">Koreyscha</option>
+                            <option value="japanese">Yaponcha</option>
+                            <option value="chinese">Xitoycha</option>
+                            <option value="german">Nemischa</option>
+                            <option value="french">Fransuzcha</option>
+                            <option value="uzbek">O'zbekcha</option>
+                        </select>
+                    </div>
+                    <div class="setting-group">
+                        <label>So'zlar soni:</label>
+                        <input type="number" id="words-count" min="5" max="100" value="15">
+                    </div>
+                    <div class="setting-group">
+                        <label>Eslab qolish vaqti (soniya):</label>
+                        <input type="number" id="words-time" min="10" max="600" value="60">
+                    </div>
+                    <button id="start-words" class="start-btn">Boshlash</button>
+                </div>
+
+                <!-- Display Screen -->
+                <div id="words-display" class="display-screen">
+                    <div class="timer" id="words-timer">60</div>
+                    <div class="words-list" id="words-list"></div>
+                </div>
+
+                <!-- Input Screen -->
+                <div id="words-input" class="input-screen">
+                    <h3>So'zlarni eslab qoling</h3>
+                    <div class="words-input-list" id="words-input-list"></div>
+                    <button id="check-words" class="check-btn">Tekshirish</button>
+                </div>
+
+                <!-- Results Screen -->
+                <div id="words-results" class="results-screen">
+                    <h3>So'zlar Natijalari</h3>
+                    <div class="score-display">
+                        <div class="score-circle">
+                            <span id="words-score">0</span>
+                            <small>ball</small>
+                        </div>
+                    </div>
+                    <div class="results-comparison" id="words-comparison"></div>
+                    <div class="action-buttons">
+                        <button class="home-btn">Bosh Sahifa</button>
+                        <button class="retry-btn">Qayta O'ynash</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Flashcards Section -->
+        <div id="flashcards-section" class="section">
+            <div class="game-header">
+                <button class="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h2>Flashcards</h2>
+            </div>
+
+            <div class="game-content">
+                <!-- Language Selection -->
+                <div id="flashcards-language" class="settings-screen">
+                    <h3>Tilni tanlang</h3>
+                    <div class="languages-grid">
+                        <div class="language-card" data-lang="english">
+                            <i class="fas fa-globe-americas"></i>
+                            <span>Inglizcha</span>
+                        </div>
+                        <div class="language-card" data-lang="korean">
+                            <i class="fas fa-globe-asia"></i>
+                            <span>Koreyscha</span>
+                        </div>
+                        <div class="language-card" data-lang="japanese">
+                            <i class="fas fa-globe-asia"></i>
+                            <span>Yaponcha</span>
+                        </div>
+                        <div class="language-card" data-lang="chinese">
+                            <i class="fas fa-globe-asia"></i>
+                            <span>Xitoycha</span>
+                        </div>
+                        <div class="language-card" data-lang="german">
+                            <i class="fas fa-globe-europe"></i>
+                            <span>Nemischa</span>
+                        </div>
+                        <div class="language-card" data-lang="french">
+                            <i class="fas fa-globe-europe"></i>
+                            <span>Fransuzcha</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Topics Selection -->
+                <div id="flashcards-topics" class="settings-screen">
+                    <h3>Mavzuni tanlang</h3>
+                    <div class="topics-grid" id="topics-grid"></div>
+                </div>
+
+                <!-- Flashcards Practice -->
+                <div id="flashcards-practice" class="flashcards-screen">
+                    <div class="flashcard-container">
+                        <div class="flashcard" id="flashcard">
+                            <div class="flashcard-front">
+                                <div class="flashcard-word" id="flashcard-word"></div>
+                                <div class="flashcard-pronunciation" id="flashcard-pronunciation"></div>
+                            </div>
+                            <div class="flashcard-back">
+                                <div class="flashcard-translation" id="flashcard-translation"></div>
+                                <div class="flashcard-pronunciation" id="flashcard-back-pronunciation"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flashcard-controls">
+                        <button id="flip-card" class="flip-btn">
+                            <i class="fas fa-sync"></i> Aylantirish
+                        </button>
+                        <button id="next-card" class="next-btn">
+                            Keyingi <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                    <div class="progress-info">
+                        <span id="card-progress">1/20</span>
+                        <button id="finish-cards" class="finish-btn">Tayyorman</button>
+                    </div>
+                </div>
+
+                <!-- Flashcards Test -->
+                <div id="flashcards-test" class="input-screen">
+                    <h3>So'zlarni eslab qoling</h3>
+                    <div class="test-type-selector">
+                        <button class="test-type-btn active" data-type="foreignToNative">
+                            Chet til → Tarjima
+                        </button>
+                        <button class="test-type-btn" data-type="nativeToForeign">
+                            Tarjima → Chet til
+                        </button>
+                    </div>
+                    <div class="test-words-list" id="test-words-list"></div>
+                    <button id="check-flashcards" class="check-btn">Tekshirish</button>
+                </div>
+
+                <!-- Flashcards Results -->
+                <div id="flashcards-results" class="results-screen">
+                    <h3>Flashcards Natijalari</h3>
+                    <div class="score-display">
+                        <div class="score-circle">
+                            <span id="flashcards-score">0</span>
+                            <small>ball</small>
+                        </div>
+                    </div>
+                    <div class="results-comparison" id="flashcards-comparison"></div>
+                    <div class="action-buttons">
+                        <button class="home-btn">Bosh Sahifa</button>
+                        <button class="retry-btn">Qayta O'ynash</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results-section" class="section">
+            <div class="game-header">
+                <button class="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h2>Mening Natijalarim</h2>
+            </div>
+
+            <div class="results-content">
+                <div class="stats-overview">
+                    <div class="stat-card">
+                        <i class="fas fa-gamepad"></i>
+                        <h3 id="total-games-played">0</h3>
+                        <p>Jami O'yinlar</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-trophy"></i>
+                        <h3 id="average-score">0</h3>
+                        <p>O'rtacha Ball</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-brain"></i>
+                        <h3 id="best-score">0</h3>
+                        <p>Eng Yaxshi Natija</p>
+                    </div>
+                </div>
+
+                <div class="results-history">
+                    <h3>O'yinlar Tarixi</h3>
+                    <div class="history-list" id="history-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Files -->
+    <script src="data.js"></script>
+    <script src="utils/storage.js"></script>
+    <script src="utils/helpers.js"></script>
+    <script src="modules/numbers.js"></script>
+    <script src="modules/words.js"></script>
+    <script src="modules/flashcards.js"></script>
+    <script src="modules/faces.js"></script>
+    <script src="modules/images.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
