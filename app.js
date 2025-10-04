@@ -1,20 +1,169 @@
-// Memory Master - App.js (Xatosiz versiya)
-const App = {
+// Memory Master - To'liq birlashtirilgan App.js
+const MemoryMaster = {
+    // Asosiy o'zgaruvchilar
     currentSection: 'profile-section',
     profileData: null,
-    isInitialized: false,
     
+    // Storage funksiyalari
+    StorageManager: {
+        KEYS: {
+            USER_PROFILE: 'memory_master_profile',
+            GAME_RESULTS: 'memory_master_results',
+            GAME_STATS: 'memory_master_stats',
+            FLASHCARDS_PROGRESS: 'memory_master_flashcards'
+        },
+
+        getProfile() {
+            try {
+                const profile = localStorage.getItem(this.KEYS.USER_PROFILE);
+                if (!profile) {
+                    return this.createDefaultProfile();
+                }
+                return JSON.parse(profile);
+            } catch (error) {
+                console.error('Profil o\'qishda xato:', error);
+                return this.createDefaultProfile();
+            }
+        },
+
+        createDefaultProfile() {
+            const defaultProfile = {
+                name: 'Foydalanuvchi',
+                avatar: '',
+                totalScore: 0,
+                gamesPlayed: 0,
+                joinDate: new Date().toISOString(),
+                bestScores: { numbers: 0, words: 0, faces: 0, images: 0 }
+            };
+            this.saveProfile(defaultProfile);
+            return defaultProfile;
+        },
+
+        saveProfile(profileData) {
+            try {
+                localStorage.setItem(this.KEYS.USER_PROFILE, JSON.stringify(profileData));
+                return true;
+            } catch (error) {
+                console.error('Profil saqlashda xato:', error);
+                return false;
+            }
+        },
+
+        updateAvatar(avatarData) {
+            const profile = this.getProfile();
+            profile.avatar = avatarData;
+            return this.saveProfile(profile);
+        },
+
+        getStats() {
+            try {
+                const stats = localStorage.getItem(this.KEYS.GAME_STATS);
+                return stats ? JSON.parse(stats) : {
+                    totalGames: 0, totalScore: 0, averageScore: 0, games: {}
+                };
+            } catch (error) {
+                return { totalGames: 0, totalScore: 0, averageScore: 0, games: {} };
+            }
+        },
+
+        saveGameResult(gameData) {
+            try {
+                const results = this.getGameResults();
+                const result = {
+                    id: Date.now(),
+                    gameType: gameData.gameType,
+                    score: gameData.score,
+                    total: gameData.total,
+                    percentage: gameData.percentage,
+                    date: new Date().toISOString(),
+                    correctCount: gameData.correctCount
+                };
+
+                results.unshift(result);
+                if (results.length > 50) results.splice(50);
+                localStorage.setItem(this.KEYS.GAME_RESULTS, JSON.stringify(results));
+                
+                // Statistikani yangilash
+                this.updateStats(gameData);
+                return true;
+            } catch (error) {
+                console.error('Natija saqlashda xato:', error);
+                return false;
+            }
+        },
+
+        getGameResults() {
+            try {
+                const results = localStorage.getItem(this.KEYS.GAME_RESULTS);
+                return results ? JSON.parse(results) : [];
+            } catch (error) {
+                return [];
+            }
+        },
+
+        updateStats(gameData) {
+            const stats = this.getStats();
+            const profile = this.getProfile();
+
+            stats.totalGames = (stats.totalGames || 0) + 1;
+            stats.totalScore = (stats.totalScore || 0) + gameData.score;
+            stats.averageScore = Math.round(stats.totalScore / stats.totalGames);
+
+            profile.gamesPlayed = stats.totalGames;
+            profile.totalScore = stats.totalScore;
+
+            if (gameData.score > (profile.bestScores[gameData.gameType] || 0)) {
+                profile.bestScores[gameData.gameType] = gameData.score;
+            }
+
+            localStorage.setItem(this.KEYS.GAME_STATS, JSON.stringify(stats));
+            this.saveProfile(profile);
+        },
+
+        getFlashcardsProgress() {
+            try {
+                const progress = localStorage.getItem(this.KEYS.FLASHCARDS_PROGRESS);
+                return progress ? JSON.parse(progress) : {};
+            } catch (error) {
+                return {};
+            }
+        }
+    },
+
+    // Helper funksiyalari
+    Helpers: {
+        formatNumber(num) {
+            return new Intl.NumberFormat('uz-UZ').format(num);
+        },
+
+        formatDate(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+            
+            if (diffDays === 0) return "Bugun";
+            if (diffDays === 1) return "Kecha";
+            if (diffDays < 7) return `${diffDays} kun oldin`;
+            
+            return date.toLocaleDateString('uz-UZ');
+        },
+
+        getScoreColor(percentage) {
+            if (percentage >= 90) return '#10b981';
+            if (percentage >= 70) return '#f59e0b';
+            if (percentage >= 50) return '#f97316';
+            return '#ef4444';
+        },
+
+        showMessage(message, type = 'info') {
+            // Soddalashtirilgan message
+            alert(message);
+        }
+    },
+
     // Dasturni ishga tushirish
     init() {
-        console.log('🚀 Dastur ishga tushmoqda...');
-        
-        // Kutubxonalar yuklanganligini tekshirish
-        if (!this.checkDependencies()) {
-            console.log('⏳ Kutubxonalar yuklanmoqda, kutish...');
-            setTimeout(() => this.init(), 100);
-            return;
-        }
-
+        console.log('🎮 Memory Master ishga tushmoqda...');
         this.showLoadingScreen();
         
         setTimeout(() => {
@@ -22,22 +171,8 @@ const App = {
             this.loadProfileData();
             this.hideLoadingScreen();
             this.showSection('profile-section');
-            this.isInitialized = true;
-            console.log('✅ Dastur muvaffaqiyatli ishga tushdi');
-        }, 1000);
-    },
-
-    // Kutubxonalarni tekshirish
-    checkDependencies() {
-        const deps = ['StorageManager', 'DataManager'];
-        for (const dep of deps) {
-            if (typeof window[dep] === 'undefined') {
-                console.warn(`❌ ${dep} hali yuklanmadi`);
-                return false;
-            }
-        }
-        console.log('✅ Barcha kutubxonalar yuklandi');
-        return true;
+            console.log('✅ Dastur tayyor!');
+        }, 1500);
     },
 
     showLoadingScreen() {
@@ -56,9 +191,9 @@ const App = {
     },
 
     setupEventListeners() {
-        console.log('🔧 Event listenerlar o\'rnatilmoqda...');
         this.setupProfileImageUpload();
         this.setupGameCards();
+        this.setupBackButtons();
     },
 
     setupProfileImageUpload() {
@@ -83,9 +218,9 @@ const App = {
 
         const reader = new FileReader();
         reader.onload = (e) => {
-            StorageManager.updateAvatar(e.target.result);
+            this.StorageManager.updateAvatar(e.target.result);
             this.updateProfileDisplay();
-            alert('Profil rasmi yangilandi!');
+            alert('✅ Profil rasmi yangilandi!');
         };
         reader.readAsDataURL(file);
     },
@@ -99,28 +234,34 @@ const App = {
         });
     },
 
-    startGame(gameType) {
-        console.log('🎮 Oʻyin boshlanmoqda:', gameType);
-        
-        const gameModules = {
-            'numbers': 'NumbersGame',
-            'words': 'WordsGame', 
-            'flashcards': 'FlashcardsGame',
-            'faces': 'FacesGame',
-            'images': 'ImagesGame'
-        };
+    setupBackButtons() {
+        document.querySelectorAll('.back-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                this.showSection('profile-section');
+            });
+        });
+    },
 
-        const moduleName = gameModules[gameType];
-        if (moduleName && window[moduleName]) {
-            this.showSection(gameType + '-section');
-            window[moduleName].init();
-        } else if (gameType === 'results') {
+    startGame(gameType) {
+        console.log('🎯 Oʻyin boshlanmoqda:', gameType);
+        
+        if (gameType === 'results') {
             this.showSection('results-section');
             this.loadResultsData();
         } else {
-            console.error('❌ Oʻyin moduli topilmadi:', gameType);
-            alert('Bu oʻyin hozircha mavjud emas');
+            alert(`🎮 "${this.getGameName(gameType)}" o'yini tez orada qo'shiladi!`);
         }
+    },
+
+    getGameName(gameType) {
+        const names = {
+            'numbers': 'Raqamlar',
+            'words': 'Soʻzlar', 
+            'flashcards': 'Flashcards',
+            'faces': 'Yuz va Ismlar',
+            'images': 'Rasmlar'
+        };
+        return names[gameType] || gameType;
     },
 
     showSection(sectionId) {
@@ -139,12 +280,8 @@ const App = {
 
     loadProfileData() {
         console.log('📊 Profil maʼlumotlari yuklanmoqda...');
-        try {
-            this.profileData = StorageManager.getProfile();
-            this.updateProfileDisplay();
-        } catch (error) {
-            console.error('❌ Profil yuklashda xato:', error);
-        }
+        this.profileData = this.StorageManager.getProfile();
+        this.updateProfileDisplay();
     },
 
     updateProfileDisplay() {
@@ -152,14 +289,14 @@ const App = {
 
         // Asosiy profil ma'lumotlari
         const elements = {
-            'profile-name': this.profileData.name || 'Foydalanuvchi',
-            'total-score': this.formatNumber(this.profileData.totalScore || 0),
-            'games-played': this.formatNumber(this.profileData.gamesPlayed || 0),
-            'numbers-best': this.formatNumber(this.profileData.bestScores?.numbers || 0),
-            'words-best': this.formatNumber(this.profileData.bestScores?.words || 0),
-            'faces-best': this.formatNumber(this.profileData.bestScores?.faces || 0),
-            'images-best': this.formatNumber(this.profileData.bestScores?.images || 0),
-            'total-games': this.formatNumber(this.profileData.gamesPlayed || 0)
+            'profile-name': this.profileData.name,
+            'total-score': this.Helpers.formatNumber(this.profileData.totalScore),
+            'games-played': this.Helpers.formatNumber(this.profileData.gamesPlayed),
+            'numbers-best': this.Helpers.formatNumber(this.profileData.bestScores.numbers),
+            'words-best': this.Helpers.formatNumber(this.profileData.bestScores.words),
+            'faces-best': this.Helpers.formatNumber(this.profileData.bestScores.faces),
+            'images-best': this.Helpers.formatNumber(this.profileData.bestScores.images),
+            'total-games': this.Helpers.formatNumber(this.profileData.gamesPlayed)
         };
 
         for (const [id, value] of Object.entries(elements)) {
@@ -170,14 +307,7 @@ const App = {
         // Flashcards statistikasi
         const flashcardsCount = document.getElementById('flashcards-count');
         if (flashcardsCount) {
-            const progress = StorageManager.getFlashcardsProgress();
-            let mastered = 0;
-            Object.values(progress).forEach(lang => {
-                Object.values(lang).forEach(topic => {
-                    mastered += topic.mastered || 0;
-                });
-            });
-            flashcardsCount.textContent = this.formatNumber(mastered);
+            flashcardsCount.textContent = '0';
         }
 
         // Profil rasmi
@@ -189,19 +319,15 @@ const App = {
     },
 
     loadResultsData() {
-        try {
-            const stats = StorageManager.getStats();
-            const results = StorageManager.getGameResults();
+        const stats = this.StorageManager.getStats();
+        const results = this.StorageManager.getGameResults();
 
-            // Umumiy statistikani yangilash
-            document.getElementById('total-games-played').textContent = this.formatNumber(stats.totalGames || 0);
-            document.getElementById('average-score').textContent = this.formatNumber(stats.averageScore || 0);
-            document.getElementById('best-score').textContent = this.formatNumber(stats.totalScore || 0);
+        // Umumiy statistikani yangilash
+        document.getElementById('total-games-played').textContent = this.Helpers.formatNumber(stats.totalGames);
+        document.getElementById('average-score').textContent = this.Helpers.formatNumber(stats.averageScore);
+        document.getElementById('best-score').textContent = this.Helpers.formatNumber(stats.totalScore);
 
-            this.updateResultsHistory(results);
-        } catch (error) {
-            console.error('❌ Natijalar yuklashda xato:', error);
-        }
+        this.updateResultsHistory(results);
     },
 
     updateResultsHistory(results) {
@@ -220,56 +346,22 @@ const App = {
             item.innerHTML = `
                 <div class="history-game">
                     <strong>${this.getGameName(result.gameType)}</strong>
-                    <small>${this.formatDate(result.date)}</small>
+                    <small>${this.Helpers.formatDate(result.date)}</small>
                 </div>
-                <div class="history-score" style="background: ${this.getScoreColor(result.percentage)};">
+                <div class="history-score" style="background: ${this.Helpers.getScoreColor(result.percentage)};">
                     ${result.score}
                 </div>
                 <div class="history-date">
-                    <strong style="color: ${this.getScoreColor(result.percentage)};">${result.percentage}%</strong>
+                    <strong style="color: ${this.Helpers.getScoreColor(result.percentage)};">${result.percentage}%</strong>
                     <small>${result.correctCount}/${result.total}</small>
                 </div>
             `;
             historyList.appendChild(item);
         });
-    },
-
-    getGameName(gameType) {
-        const names = {
-            'numbers': '🔢 Raqamlar',
-            'words': '📝 Soʻzlar', 
-            'flashcards': '🃏 Flashcards',
-            'faces': '👥 Yuz va Ismlar',
-            'images': '🖼️ Rasmlar'
-        };
-        return names[gameType] || gameType;
-    },
-
-    getScoreColor(percentage) {
-        if (percentage >= 90) return '#10b981';
-        if (percentage >= 70) return '#f59e0b';
-        if (percentage >= 50) return '#f97316';
-        return '#ef4444';
-    },
-
-    formatNumber(num) {
-        return new Intl.NumberFormat('uz-UZ').format(num);
-    },
-
-    formatDate(dateString) {
-        const date = new Date(dateString);
-        const now = new Date();
-        const diffDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
-        
-        if (diffDays === 0) return "Bugun";
-        if (diffDays === 1) return "Kecha";
-        if (diffDays < 7) return `${diffDays} kun oldin`;
-        
-        return date.toLocaleDateString('uz-UZ');
     }
 };
 
-// Dasturni ishga tushirish (xavfsiz)
+// Dasturni ishga tushirish
 document.addEventListener('DOMContentLoaded', function() {
     console.log('📄 DOM yuklandi');
     
@@ -282,10 +374,8 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('❌ LocalStorage ishlamayapti');
     }
 
-    // Dasturni boshlash (kutubxonalar yuklanishini kutish)
-    setTimeout(() => {
-        App.init();
-    }, 100);
+    // Dasturni boshlash
+    MemoryMaster.init();
 });
 
 // Global error handling
@@ -293,5 +383,5 @@ window.addEventListener('error', function(e) {
     console.error('🔥 Global xato:', e.error);
 });
 
-window.App = App;
-console.log('👨‍💻 App.js yuklandi');
+window.App = MemoryMaster;
+console.log('👨‍💻 Memory Master yuklandi');
