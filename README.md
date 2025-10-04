@@ -18,3 +18,15 @@ Xotira va aql o'yinlari platformasi. Turli o'yinlar orqali miyangizni mashq qili
 - 🇰🇷 Koreys
 - 🇨🇳 Xitoy
 - 🇪🇸 Ispan
+
+## 🚀 O'rnatish
+
+```bash
+# 1. Repository ni yuklab olish
+git clone https://github.com/SIZNING_USERNAME/memory-master.git
+
+# 2. Papkaga o'tish
+cd memory-master
+
+# 3. Brauzerda ochish
+# index.html faylini brauzerda oching
