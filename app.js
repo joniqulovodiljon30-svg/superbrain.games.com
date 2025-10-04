@@ -1,318 +1,134 @@
-// Memory Master - Asosiy Ilova
-class GameApp {
-    constructor() {
-        this.currentGame = null;
-        this.currentMode = null;
-        this.score = 0;
-        this.steps = 0;
-        this.gameTime = 0;
+// app.js - Yangilangan Raqamlar O'yini
+class MemoryMaster {
+    // ... oldingi kodlar o'zgarmaydi ...
+
+    showNumbersGame(container) {
+        console.log('🔢 Showing numbers game');
         
-        this.init();
-    }
-
-    init() {
-        this.bindEvents();
-        this.showWelcomeScreen();
-        this.hideLoadingScreen();
-        this.updateUserProfile();
-    }
-
-    bindEvents() {
-        // Welcome screen events
-        document.getElementById('start-btn').addEventListener('click', () => {
-            this.showGameModes();
-        });
-
-        // Game mode cards
-        document.querySelectorAll('.mode-card').forEach(card => {
-            card.addEventListener('click', (e) => {
-                const mode = e.currentTarget.dataset.mode;
-                this.startGameMode(mode);
-            });
-        });
-
-        // Back buttons
-        document.getElementById('back-to-welcome').addEventListener('click', () => {
-            this.showWelcomeScreen();
-        });
-
-        document.getElementById('game-back-btn').addEventListener('click', () => {
-            this.showGameModes();
-        });
-
-        // Results buttons
-        document.getElementById('play-again-btn').addEventListener('click', () => {
-            if (this.currentMode) {
-                this.startGameMode(this.currentMode);
-            }
-        });
-
-        document.getElementById('back-to-modes-btn').addEventListener('click', () => {
-            this.showGameModes();
-        });
-
-        // Profile modal
-        document.getElementById('profile-btn').addEventListener('click', () => {
-            this.showProfileModal();
-        });
-
-        document.querySelector('.close-modal').addEventListener('click', () => {
-            this.hideProfileModal();
-        });
-
-        // Modal background click
-        document.getElementById('profile-modal').addEventListener('click', (e) => {
-            if (e.target === e.currentTarget) {
-                this.hideProfileModal();
-            }
-        });
-    }
-
-    hideLoadingScreen() {
-        setTimeout(() => {
-            const loadingScreen = document.getElementById('loading');
-            loadingScreen.classList.add('fade-out');
-            
-            setTimeout(() => {
-                loadingScreen.style.display = 'none';
-            }, 500);
-        }, 1500);
-    }
-
-    showWelcomeScreen() {
-        this.hideAllSections();
-        document.getElementById('welcome-section').classList.add('active');
-        this.updateScore(0, 0);
-    }
-
-    showGameModes() {
-        this.hideAllSections();
-        document.getElementById('game-modes').classList.add('active');
-        this.updateScore(0, 0);
-    }
-
-    startGameMode(mode) {
-        this.currentMode = mode;
-        this.hideAllSections();
-        document.getElementById('game-area').classList.add('active');
+        // O'yin darajasini aniqlash
+        const level = this.getCurrentLevel();
+        const sequenceLength = level.sequenceLength;
+        const displayTime = level.displayTime;
         
-        // Tanlangan o'yinni boshlash
-        switch (mode) {
-            case 'numbers':
-                this.currentGame = NumbersGameInstance;
-                break;
-            case 'words':
-                this.currentGame = WordsGameInstance;
-                break;
-            case 'flashcards':
-                // Keyinroq to'ldiramiz
-                this.showComingSoon();
-                return;
-            case 'faces':
-                this.showComingSoon();
-                return;
-            case 'images':
-                this.showComingSoon();
-                return;
-        }
-
-        if (this.currentGame) {
-            this.currentGame.startGame();
-        }
-    }
-
-    showComingSoon() {
-        const gameContent = document.getElementById('game-content');
-        gameContent.innerHTML = `
-            <div class="coming-soon">
-                <div class="coming-soon-icon">
-                    <i class="fas fa-tools"></i>
+        // Tasodifiy raqamlar ketma-ketligini yaratish
+        const sequence = this.generateRandomSequence(sequenceLength);
+        
+        container.innerHTML = `
+            <div class="numbers-game">
+                <div class="game-level-info">
+                    <h2 style="font-size: 1.75rem; margin-bottom: 0.5rem;">🔢 Raqamlar O'yini</h2>
+                    <p style="font-size: 1rem; color: var(--text-secondary); margin-bottom: 0.25rem;">
+                        Daraja: ${level.number} - ${sequenceLength} ta raqam
+                    </p>
+                    <p style="font-size: 0.9rem; color: var(--text-muted);">
+                        ${sequenceLength} ta raqamni ${displayTime/1000} soniya davomida eslab qoling
+                    </p>
                 </div>
-                <h3>Tez Kunda</h3>
-                <p>Ushbu o'yin hozircha ishlab chiqilmoqda. Iltimos, keyinroq qayta urinib ko'ring.</p>
-                <button class="control-button primary" onclick="window.gameApp.showGameModes()">
-                    <i class="fas fa-arrow-left"></i>
-                    O'yinlar Menyusiga Qaytish
+                
+                <div class="numbers-display" id="numbers-display">
+                    ${sequence.map(num => `
+                        <div class="number-display-card showing" data-number="${num}">
+                            ${num}
+                        </div>
+                    `).join('')}
+                </div>
+                
+                <div class="game-timer" style="margin: 1.5rem 0;">
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 1rem;">
+                        <div style="font-size: 2rem; font-weight: 700; color: var(--primary);" id="countdown-timer">
+                            ${displayTime/1000}
+                        </div>
+                        <span style="color: var(--text-secondary);">soniya qoldi</span>
+                    </div>
+                </div>
+                
+                <button class="action-button primary" onclick="memoryMaster.startNumbersInput()" id="ready-btn" style="display: none; margin: 0 auto;">
+                    <i class="fas fa-play"></i>
+                    Tayyorman - Raqamlarni kiriting
                 </button>
             </div>
         `;
-    }
 
-    showResults(score, steps, time, isWin = true) {
-        this.hideAllSections();
-        document.getElementById('results-section').classList.add('active');
-        
-        // Natijalarni yangilash
-        document.getElementById('final-score').textContent = Helpers.formatNumber(score);
-        document.getElementById('final-steps').textContent = Helpers.formatNumber(steps);
-        document.getElementById('final-time').textContent = Helpers.formatTime(time);
-        
-        // Xabarni yangilash
-        const messageText = document.getElementById('result-message-text');
-        if (isWin) {
-            messageText.textContent = this.getWinMessage(score);
-            messageText.style.color = 'var(--success)';
-            Helpers.showConfetti();
-        } else {
-            messageText.textContent = this.getLoseMessage(score);
-            messageText.style.color = 'var(--danger)';
-        }
-        
-        // Profil ma'lumotlarini yangilash
-        this.updateUserProfile();
-    }
-
-    getWinMessage(score) {
-        const messages = [
-            "Ajoyib natija! Siz haqiqiy Memory Mastersiz! 🏆",
-            "Fantastik! Xotirangiz juda kuchli! 💪",
-            "Tabriklaymiz! A'lo darajada o'ynadingiz! 🌟",
-            "Mukammal! Barcha darajalarni muvaffaqqiyatli yakunladingiz! 🎯"
-        ];
-        return messages[Math.floor(Math.random() * messages.length)];
-    }
-
-    getLoseMessage(score) {
-        const messages = [
-            "Yaxshi urinish! Keyingi safar yaxshiroq natija ko'rsatasiz! 💫",
-            "Juda yaxshi! Mashq qilishda davom eting! 📚",
-            "Yaxshi natija! Keyingi o'yinda yanada yaxshilashingiz mumkin! 🚀"
-        ];
-        return messages[Math.floor(Math.random() * messages.length)];
-    }
-
-    updateScore(score, steps) {
-        this.score = score;
-        this.steps = steps;
-        
-        document.getElementById('current-score').textContent = Helpers.formatNumber(score);
-        document.getElementById('current-step').textContent = Helpers.formatNumber(steps);
-    }
-
-    showProfileModal() {
-        document.getElementById('profile-modal').classList.add('active');
-    }
-
-    hideProfileModal() {
-        document.getElementById('profile-modal').classList.remove('active');
-    }
-
-    updateUserProfile() {
-        const userData = Storage.getUserData();
-        const stats = Storage.getStats();
-        
-        // Foydalanuvchi ma'lumotlari
-        document.getElementById('user-name').textContent = userData.name;
-        
-        // Statistika
-        const statElements = document.querySelectorAll('.stat-number');
-        if (statElements.length >= 3) {
-            statElements[0].textContent = userData.gamesPlayed;
-            statElements[1].textContent = userData.achievements?.length || 0;
+        // Vaqt hisoblagich
+        let timeLeft = displayTime / 1000;
+        const countdownElement = document.getElementById('countdown-timer');
+        const countdownInterval = setInterval(() => {
+            timeLeft--;
+            if (countdownElement) {
+                countdownElement.textContent = timeLeft;
+                
+                // Rang o'zgarishi
+                if (timeLeft <= 3) {
+                    countdownElement.style.color = 'var(--danger)';
+                } else if (timeLeft <= 10) {
+                    countdownElement.style.color = 'var(--warning)';
+                }
+            }
             
-            // Eng yuqori ball
-            const bestScore = Math.max(
-                stats.numbers?.bestScore || 0,
-                stats.words?.bestScore || 0,
-                stats.flashcards?.bestScore || 0,
-                stats.faces?.bestScore || 0,
-                stats.images?.bestScore || 0
-            );
-            statElements[2].textContent = Helpers.formatNumber(bestScore);
-        }
+            if (timeLeft <= 0) {
+                clearInterval(countdownInterval);
+                this.hideNumbersAndShowInput();
+            }
+        }, 1000);
+
+        // Ketma-ketlikni saqlash
+        this.currentSequence = sequence;
+        this.currentLevel = level;
     }
 
-    hideAllSections() {
-        const sections = document.querySelectorAll('main > section');
-        sections.forEach(section => {
-            section.classList.remove('active');
-        });
+    getCurrentLevel() {
+        const levels = [
+            { number: 1, sequenceLength: 3, displayTime: 3000, points: 100 },
+            { number: 2, sequenceLength: 4, displayTime: 4000, points: 150 },
+            { number: 3, sequenceLength: 5, displayTime: 5000, points: 200 },
+            { number: 4, sequenceLength: 6, displayTime: 6000, points: 250 },
+            { number: 5, sequenceLength: 7, displayTime: 7000, points: 300 }
+        ];
         
-        // Modalni yopish
-        this.hideProfileModal();
+        // Hozirgi darajani aniqlash (keyinchalik progress asosida)
+        return levels[0]; // Boshlang'ich daraja
     }
+
+    generateRandomSequence(length) {
+        const sequence = [];
+        const usedNumbers = new Set();
+        
+        while (sequence.length < length) {
+            const randomNum = Math.floor(Math.random() * 9) + 1;
+            if (!usedNumbers.has(randomNum)) {
+                sequence.push(randomNum);
+                usedNumbers.add(randomNum);
+            }
+        }
+        
+        return sequence;
+    }
+
+    hideNumbersAndShowInput() {
+        const numbers = document.querySelectorAll('.number-display-card');
+        numbers.forEach(number => {
+            number.classList.remove('showing');
+            number.classList.add('hidden');
+            number.innerHTML = '?';
+        });
+
+        document.getElementById('countdown-timer').style.display = 'none';
+        document.getElementById('ready-btn').style.display = 'flex';
+        
+        // O'yin vaqtini boshlash
+        this.startGameTimer();
+    }
+
+    startGameTimer() {
+        this.gameStartTime = Date.now();
+        this.timerInterval = setInterval(() => {
+            const elapsed = Math.floor((Date.now() - this.gameStartTime) / 1000);
+            const minutes = Math.floor(elapsed / 60);
+            const seconds = elapsed % 60;
+            this.updateGameInfo(this.currentScore, this.currentSteps, 
+                              `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`);
+        }, 1000);
+    }
+
+    // ... qolgan metodlar o'zgarmaydi ...
 }
-
-// Ilovani ishga tushirish
-document.addEventListener('DOMContentLoaded', () => {
-    window.gameApp = new GameApp();
-});
-
-// Global funksiyalar
-window.showGameModes = function() {
-    if (window.gameApp) {
-        window.gameApp.showGameModes();
-    }
-};
-window.FlashcardsGameInstance = FlashcardsGameInstance;
-window.FacesGameInstance = FacesGameInstance;
-window.ImagesGameInstance = ImagesGameInstance;
-
-// Global funksiyalar
-window.startFlashcardsGame = function() {
-    if (window.gameApp) {
-        window.gameApp.startGameMode('flashcards');
-    }
-};
-
-window.startFacesGame = function() {
-    if (window.gameApp) {
-        window.gameApp.startGameMode('faces');
-    }
-};
-
-window.startImagesGame = function() {
-    if (window.gameApp) {
-        window.gameApp.startGameMode('images');
-    }
-};
-window.UserManager = UserManager;
-window.StatsManager = StatsManager;
-
-console.log('🎮 Memory Master app.js loaded successfully');
-
-// Loading screen ni avtomatik yopish
-setTimeout(() => {
-    const loadingScreen = document.getElementById('loading');
-    if (loadingScreen && !window.gameApp) {
-        console.log('⚠️ GameApp not initialized - auto-hiding loading screen');
-        loadingScreen.classList.add('fade-out');
-        setTimeout(() => {
-            loadingScreen.style.display = 'none';
-        }, 500);
-    }
-}, 3000);
-
-// Global function for testing
-window.testGameApp = function() {
-    console.log('🧪 Testing GameApp...');
-    
-    if (typeof GameApp !== 'undefined') {
-        console.log('✅ GameApp class found');
-        try {
-            window.gameApp = new GameApp();
-            console.log('✅ GameApp initialized successfully');
-            return true;
-        } catch (error) {
-            console.error('❌ GameApp initialization failed:', error);
-            return false;
-        }
-    } else {
-        console.error('❌ GameApp class not found');
-        return false;
-    }
-};
-
-// Auto-test on load
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('🏠 DOM Content Loaded');
-    
-    // 2 soniyadan so'ng test qilish
-    setTimeout(() => {
-        if (!window.gameApp) {
-            console.log('🔄 Auto-testing GameApp...');
-            window.testGameApp();
-        }
-    }, 2000);
-});
-
