@@ -236,6 +236,4 @@ const imagesDatabase = [
     { description: "Yashil daraxt", category: "Tabiat", emoji: "🌳" },
     { description: "Ko'k osmon", category: "Tabiat", emoji: "🌌" },
     { description: "Sariq quyosh", category: "Tabiat", emoji: "☀️" },
-
-    { description: "Oq uy", category: "Binol":, emoji " " },
-    
+    { description: "Oq uy", category: "Binol
