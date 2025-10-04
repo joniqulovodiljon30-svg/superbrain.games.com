@@ -18,24 +18,16 @@ const MemoryMaster = {
         getProfile() {
             try {
                 const profile = localStorage.getItem(this.KEYS.USER_PROFILE);
-                console.log('LocalStorage dan profil:', profile);
-                
                 if (!profile) {
-                    console.log('Profil topilmadi, yangi profil yaratilmoqda...');
                     return this.createDefaultProfile();
                 }
-                
-                const parsedProfile = JSON.parse(profile);
-                console.log('Profil muvaffaqiyatli yuklandi:', parsedProfile);
-                return parsedProfile;
+                return JSON.parse(profile);
             } catch (error) {
-                console.error('Profil o\'qishda xato:', error);
                 return this.createDefaultProfile();
             }
         },
 
         createDefaultProfile() {
-            console.log('Yangi profil yaratilmoqda...');
             const defaultProfile = {
                 name: 'Foydalanuvchi',
                 avatar: '',
@@ -50,39 +42,23 @@ const MemoryMaster = {
                     flashcards: 0 
                 }
             };
-            
-            const saved = this.saveProfile(defaultProfile);
-            console.log('Profil saqlandi:', saved);
+            this.saveProfile(defaultProfile);
             return defaultProfile;
         },
 
         saveProfile(profileData) {
             try {
-                console.log('Profil saqlanmoqda:', profileData);
                 localStorage.setItem(this.KEYS.USER_PROFILE, JSON.stringify(profileData));
-                
-                const saved = localStorage.getItem(this.KEYS.USER_PROFILE);
-                console.log('Saqlangan profil:', saved);
                 return true;
             } catch (error) {
-                console.error('Profil saqlashda xato:', error);
                 return false;
             }
         },
 
         updateAvatar(avatarData) {
-            try {
-                const profile = this.getProfile();
-                console.log('Avvalgi profil:', profile);
-                
-                profile.avatar = avatarData;
-                const saved = this.saveProfile(profile);
-                console.log('Rasm yangilandi, saqlandi:', saved);
-                return saved;
-            } catch (error) {
-                console.error('Rasm yangilashda xato:', error);
-                return false;
-            }
+            const profile = this.getProfile();
+            profile.avatar = avatarData;
+            return this.saveProfile(profile);
         },
 
         getStats() {
@@ -100,15 +76,12 @@ const MemoryMaster = {
                 }
                 return JSON.parse(stats);
             } catch (error) {
-                console.error('Statistika o\'qishda xato:', error);
                 return { totalGames: 0, totalScore: 0, averageScore: 0, games: {} };
             }
         },
 
         saveGameResult(gameData) {
             try {
-                console.log('O\'yin natijasi saqlanmoqda:', gameData);
-                
                 const results = this.getGameResults();
                 const result = {
                     id: Date.now() + Math.random(),
@@ -122,14 +95,10 @@ const MemoryMaster = {
 
                 results.unshift(result);
                 if (results.length > 50) results.splice(50);
-                
                 localStorage.setItem(this.KEYS.GAME_RESULTS, JSON.stringify(results));
-                console.log('Natijalar saqlandi, jami:', results.length);
-                
                 this.updateStats(gameData);
                 return true;
             } catch (error) {
-                console.error('Natija saqlashda xato:', error);
                 return false;
             }
         },
@@ -139,14 +108,12 @@ const MemoryMaster = {
                 const results = localStorage.getItem(this.KEYS.GAME_RESULTS);
                 return results ? JSON.parse(results) : [];
             } catch (error) {
-                console.error('Natijalarni o\'qishda xato:', error);
                 return [];
             }
         },
 
         updateStats(gameData) {
             try {
-                console.log('Statistika yangilanmoqda...');
                 const stats = this.getStats();
                 const profile = this.getProfile();
 
@@ -176,41 +143,12 @@ const MemoryMaster = {
 
                 if (gameData.score > (profile.bestScores[gameData.gameType] || 0)) {
                     profile.bestScores[gameData.gameType] = gameData.score;
-                    console.log('Yangi eng yaxshi natija:', gameData.gameType, gameData.score);
                 }
 
                 localStorage.setItem(this.KEYS.GAME_STATS, JSON.stringify(stats));
                 this.saveProfile(profile);
-                
-                console.log('Statistika yangilandi:', stats);
-                console.log('Profil yangilandi:', profile);
-                
                 return true;
             } catch (error) {
-                console.error('Statistika yangilashda xato:', error);
-                return false;
-            }
-        },
-
-        getFlashcardsProgress() {
-            try {
-                const progress = localStorage.getItem(this.KEYS.FLASHCARDS_PROGRESS);
-                return progress ? JSON.parse(progress) : {};
-            } catch (error) {
-                console.error('Flashcards progress o\'qishda xato:', error);
-                return {};
-            }
-        },
-
-        saveFlashcardsProgress(language, topic, progress) {
-            try {
-                const allProgress = this.getFlashcardsProgress();
-                if (!allProgress[language]) allProgress[language] = {};
-                allProgress[language][topic] = progress;
-                localStorage.setItem(this.KEYS.FLASHCARDS_PROGRESS, JSON.stringify(allProgress));
-                return true;
-            } catch (error) {
-                console.error('Flashcards progress saqlashda xato:', error);
                 return false;
             }
         }
@@ -228,12 +166,8 @@ const MemoryMaster = {
             uzbek: { name: "O'zbekcha", flag: "🇺🇿" }
         },
 
-        flashcardsLanguages: ['english', 'korean', 'japanese', 'chinese', 'german', 'french'],
-        wordsLanguages: ['english', 'korean', 'japanese', 'chinese', 'german', 'french', 'uzbek'],
-
         topics: [
-            "Oziq-ovqat", "Transport", "Uy-ro'zg'or", "Kasblar", "Sport",
-            "Ta'lim", "Texnologiya", "Sog'liq", "Tabiat", "San'at"
+            "Oziq-ovqat", "Transport", "Uy-ro'zg'or", "Kasblar", "Sport"
         ],
 
         vocabulary: {
@@ -241,50 +175,31 @@ const MemoryMaster = {
                 "Oziq-ovqat": [
                     { word: "Apple", pronunciation: "[ˈæp.əl]", translation: "Olma" },
                     { word: "Bread", pronunciation: "[bred]", translation: "Non" },
-                    { word: "Cheese", pronunciation: "[tʃiːz]", translation: "Pishloq" },
-                    { word: "Orange", pronunciation: "[ˈɒr.ɪndʒ]", translation: "Apelsin" },
-                    { word: "Tomato", pronunciation: "[təˈmɑː.təʊ]", translation: "Pomidor" }
+                    { word: "Cheese", pronunciation: "[tʃiːz]", translation: "Pishloq" }
                 ],
                 "Transport": [
                     { word: "Car", pronunciation: "[kɑːr]", translation: "Mashina" },
                     { word: "Bus", pronunciation: "[bʌs]", translation: "Avtobus" },
-                    { word: "Train", pronunciation: "[treɪn]", translation: "Poyezd" },
-                    { word: "Bicycle", pronunciation: "[ˈbaɪ.sɪ.kəl]", translation: "Velosiped" },
-                    { word: "Airplane", pronunciation: "[ˈeə.pleɪn]", translation: "Samolyot" }
+                    { word: "Train", pronunciation: "[treɪn]", translation: "Poyezd" }
                 ]
             },
             uzbek: {
                 "Oziq-ovqat": [
                     { word: "Olma", pronunciation: "[ol-ma]", translation: "Apple" },
                     { word: "Non", pronunciation: "[non]", translation: "Bread" },
-                    { word: "Pishloq", pronunciation: "[pish-loq]", translation: "Cheese" },
-                    { word: "Apelsin", pronunciation: "[a-pel-sin]", translation: "Orange" },
-                    { word: "Pomidor", pronunciation: "[po-mi-dor]", translation: "Tomato" }
-                ],
-                "Transport": [
-                    { word: "Mashina", pronunciation: "[ma-shi-na]", translation: "Car" },
-                    { word: "Avtobus", pronunciation: "[av-to-bus]", translation: "Bus" },
-                    { word: "Poyezd", pronunciation: "[po-yezd]", translation: "Train" },
-                    { word: "Velosiped", pronunciation: "[ve-lo-si-ped]", translation: "Bicycle" },
-                    { word: "Samolyot", pronunciation: "[sa-mo-lyot]", translation: "Airplane" }
+                    { word: "Pishloq", pronunciation: "[pish-loq]", translation: "Cheese" }
                 ]
             }
         },
 
         faces: [
-            { id: 1, name: "Ali", image: "👨", description: "Qora soch, jigarrang ko'zlar" },
-            { id: 2, name: "Malika", image: "👩", description: "Sariq soch, ko'k ko'zlar" },
-            { id: 3, name: "Hasan", image: "👨", description: "Qisqa soch, yashil ko'zlar" },
-            { id: 4, name: "Dilnoza", image: "👩", description: "Uzun qora soch, jigarrang ko'zlar" },
-            { id: 5, name: "Javohir", image: "👨", description: "Jigarrang soch, kulrang ko'zlar" }
+            { id: 1, name: "Ali", image: "👨", description: "Qora soch" },
+            { id: 2, name: "Malika", image: "👩", description: "Sariq soch" }
         ],
 
         images: [
-            { id: 1, name: "Tog'", image: "🏔️", description: "Qorli tog' cho'qqisi" },
-            { id: 2, name: "Daryo", image: "🌊", description: "Oqimli daryo" },
-            { id: 3, name: "O'rmon", image: "🌲", description: "Qalin o'rmon" },
-            { id: 4, name: "Shahar", image: "🏙️", description: "Zamonaviy shahar" },
-            { id: 5, name: "Dengiz", image: "🌊", description: "Ko'k dengiz" }
+            { id: 1, name: "Tog'", image: "🏔️", description: "Qorli tog'" },
+            { id: 2, name: "Daryo", image: "🌊", description: "Oqimli daryo" }
         ],
 
         generateRandomNumbers(count) {
@@ -299,47 +214,19 @@ const MemoryMaster = {
             const words = this.vocabulary[language]?.[topic] || [];
             const shuffled = [...words].sort(() => Math.random() - 0.5);
             return shuffled.slice(0, Math.min(count, words.length));
-        },
-
-        getRandomFaces(count) {
-            const shuffled = [...this.faces].sort(() => Math.random() - 0.5);
-            return shuffled.slice(0, Math.min(count, this.faces.length));
-        },
-
-        getRandomImages(count) {
-            const shuffled = [...this.images].sort(() => Math.random() - 0.5);
-            return shuffled.slice(0, Math.min(count, this.images.length));
-        },
-
-        getLanguageName(code) {
-            return this.languages[code]?.name || code;
         }
     },
 
     // ==================== DASTURNI ISHGA TUSHIRISH ====================
     init() {
         console.log('🎮 Memory Master ishga tushmoqda...');
-        console.log('LocalStorage mavjud:', !!localStorage);
-        
-        try {
-            localStorage.setItem('test', 'test');
-            localStorage.removeItem('test');
-            console.log('✅ LocalStorage ishlayapti');
-        } catch (error) {
-            console.error('❌ LocalStorage ishlamayapti:', error);
-            alert('LocalStorage ishlamayapti. Brauzeringizda LocalStorage qo\'llab-quvvatlanmaydi.');
-            return;
-        }
-
         this.showLoadingScreen();
         
         setTimeout(() => {
-            console.log('🔧 Dastur sozlamalari o\'rnatilmoqda...');
             this.setupEventListeners();
             this.loadProfileData();
             this.hideLoadingScreen();
             this.showSection('profile-section');
-            console.log('✅ Dastur tayyor! Profil yaratildi va saqlandi.');
         }, 1000);
     },
 
@@ -410,7 +297,7 @@ const MemoryMaster = {
     },
 
     startGame(gameType) {
-        console.log('🎯 Oʻyin boshlanmoqda:', gameType);
+        console.log('Oʻyin boshlanmoqda:', gameType);
         
         if (gameType === 'results') {
             this.showSection('results-section');
@@ -419,72 +306,43 @@ const MemoryMaster = {
             this.startNumbersGame();
         } else if (gameType === 'words') {
             this.startWordsGame();
-        } else if (gameType === 'flashcards') {
-            this.startFlashcardsGame();
-        } else if (gameType === 'faces') {
-            this.startFacesGame();
-        } else if (gameType === 'images') {
-            this.startImagesGame();
+        } else {
+            alert(`"${this.getGameName(gameType)}" o'yini tez orada qo'shiladi!`);
+            this.showSection('profile-section');
         }
     },
 
     // ==================== PROFIL MA'LUMOTLARI ====================
     loadProfileData() {
-        console.log('📊 Profil maʼlumotlari yuklanmoqda...');
-        try {
-            this.profileData = this.StorageManager.getProfile();
-            console.log('Profil maʼlumotlari yuklandi:', this.profileData);
-            this.updateProfileDisplay();
-        } catch (error) {
-            console.error('❌ Profil yuklashda xato:', error);
-            this.profileData = this.StorageManager.createDefaultProfile();
-            this.updateProfileDisplay();
-        }
+        this.profileData = this.StorageManager.getProfile();
+        this.updateProfileDisplay();
     },
 
     updateProfileDisplay() {
-        if (!this.profileData) {
-            console.error('❌ Profil maʼlumotlari mavjud emas');
-            return;
-        }
-
-        console.log('🔄 Profil ekrani yangilanmoqda...');
+        if (!this.profileData) return;
 
         const elements = {
-            'profile-name': this.profileData.name || 'Foydalanuvchi',
-            'total-score': this.formatNumber(this.profileData.totalScore || 0),
-            'games-played': this.formatNumber(this.profileData.gamesPlayed || 0),
-            'numbers-best': this.formatNumber(this.profileData.bestScores?.numbers || 0),
-            'words-best': this.formatNumber(this.profileData.bestScores?.words || 0),
-            'faces-best': this.formatNumber(this.profileData.bestScores?.faces || 0),
-            'images-best': this.formatNumber(this.profileData.bestScores?.images || 0),
+            'profile-name': this.profileData.name,
+            'total-score': this.formatNumber(this.profileData.totalScore),
+            'games-played': this.formatNumber(this.profileData.gamesPlayed),
+            'numbers-best': this.formatNumber(this.profileData.bestScores.numbers),
+            'words-best': this.formatNumber(this.profileData.bestScores.words),
+            'faces-best': this.formatNumber(this.profileData.bestScores.faces),
+            'images-best': this.formatNumber(this.profileData.bestScores.images),
             'flashcards-count': '0',
-            'total-games': this.formatNumber(this.profileData.gamesPlayed || 0)
+            'total-games': this.formatNumber(this.profileData.gamesPlayed)
         };
 
         for (const [id, value] of Object.entries(elements)) {
             const element = document.getElementById(id);
-            if (element) {
-                element.textContent = value;
-                console.log(`✅ ${id}: ${value}`);
-            } else {
-                console.warn(`❌ Element topilmadi: ${id}`);
-            }
+            if (element) element.textContent = value;
         }
 
         const profileImage = document.getElementById('profile-image');
-        if (profileImage) {
-            if (this.profileData.avatar) {
-                profileImage.src = this.profileData.avatar;
-                profileImage.style.display = 'block';
-                console.log('✅ Profil rasmi yuklandi');
-            } else {
-                profileImage.style.display = 'none';
-                console.log('ℹ️ Profil rasmi mavjud emas');
-            }
+        if (profileImage && this.profileData.avatar) {
+            profileImage.src = this.profileData.avatar;
+            profileImage.style.display = 'block';
         }
-
-        console.log('✅ Profil ekrani yangilandi');
     },
 
     // ==================== RAQAMLAR O'YINI ====================
@@ -845,8 +703,10 @@ const MemoryMaster = {
     },
 
     showGameScreen(gameType, hideScreen, showScreen) {
-        document.getElementById(`${gameType}-${hideScreen}`).style.display = 'none';
-        document.getElementById(`${gameType}-${showScreen}`).style.display = 'block';
+        const hideElement = document.getElementById(`${gameType}-${hideScreen}`);
+        const showElement = document.getElementById(`${gameType}-${showScreen}`);
+        if (hideElement) hideElement.style.display = 'none';
+        if (showElement) showElement.style.display = 'block';
     },
 
     startTimer(gameType, time, onComplete) {
@@ -857,7 +717,7 @@ const MemoryMaster = {
         
         this.timer = setInterval(() => {
             timeLeft--;
-            timerElement.textContent = timeLeft;
+            if (timerElement) timerElement.textContent = timeLeft;
             
             if (timeLeft <= 0) {
                 clearInterval(this.timer);
@@ -867,13 +727,20 @@ const MemoryMaster = {
     },
 
     setupResultsButtons(gameType) {
-        document.querySelector(`#${gameType}-results .home-btn`).addEventListener('click', () => {
-            this.showSection('profile-section');
-        });
-
-        document.querySelector(`#${gameType}-results .retry-btn`).addEventListener('click', () => {
-            this[`start${gameType.charAt(0).toUpperCase() + gameType.slice(1)}Game`]();
-        });
+        const homeBtn = document.querySelector(`#${gameType}-results .home-btn`);
+        const retryBtn = document.querySelector(`#${gameType}-results .retry-btn`);
+        
+        if (homeBtn) {
+            homeBtn.addEventListener('click', () => {
+                this.showSection('profile-section');
+            });
+        }
+        
+        if (retryBtn) {
+            retryBtn.addEventListener('click', () => {
+                this[`start${gameType.charAt(0).toUpperCase() + gameType.slice(1)}Game`]();
+            });
+        }
     },
 
     showSection(sectionId) {
@@ -892,9 +759,13 @@ const MemoryMaster = {
         const stats = this.StorageManager.getStats();
         const results = this.StorageManager.getGameResults();
 
-        document.getElementById('total-games-played').textContent = this.formatNumber(stats.totalGames);
-        document.getElementById('average-score').textContent = this.formatNumber(stats.averageScore);
-        document.getElementById('best-score').textContent = this.formatNumber(stats.totalScore);
+        const totalGames = document.getElementById('total-games-played');
+        const averageScore = document.getElementById('average-score');
+        const bestScore = document.getElementById('best-score');
+
+        if (totalGames) totalGames.textContent = this.formatNumber(stats.totalGames);
+        if (averageScore) averageScore.textContent = this.formatNumber(stats.averageScore);
+        if (bestScore) bestScore.textContent = this.formatNumber(stats.totalScore);
 
         this.updateResultsHistory(results);
     },
@@ -954,22 +825,6 @@ const MemoryMaster = {
         if (percentage >= 70) return '#f59e0b';
         if (percentage >= 50) return '#f97316';
         return '#ef4444';
-    },
-
-    // ==================== BOSHQA O'YINLAR ====================
-    startFlashcardsGame() {
-        alert('🃏 Flashcards o\'yini tez orada qo\'shiladi!');
-        this.showSection('profile-section');
-    },
-
-    startFacesGame() {
-        alert('👥 Yuz va Ismlar o\'yini tez orada qo\'shiladi!');
-        this.showSection('profile-section');
-    },
-
-    startImagesGame() {
-        alert('🖼️ Rasmlar o\'yini tez orada qo\'shiladi!');
-        this.showSection('profile-section');
     }
 };
 
