@@ -269,10 +269,6 @@ window.startImagesGame = function() {
 window.UserManager = UserManager;
 window.StatsManager = StatsManager;
 
-// O'yin natijalarini saqlashda user manager ni chaqirish
-
-// Storage.js da updateStats funksiyasini yangilash kerak
-// app.js ning OXIRIGA qo'shing
 console.log('🎮 Memory Master app.js loaded successfully');
 
 // Loading screen ni avtomatik yopish
@@ -319,3 +315,4 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }, 2000);
 });
+
