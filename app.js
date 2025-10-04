@@ -1,318 +1,206 @@
 // Global o'zgaruvchilar
 let currentUser = null;
 let currentSection = 'login-section';
-let numbersToMemorize = [];
-let wordsToMemorize = [];
-let facesToMemorize = [];
-let imagesToMemorize = [];
-let timer;
-let timeLeft;
-let testHistory = [];
-// ==================== RAQAMLAR FUNCTIONS ====================
 
-function startNumbersGame() {
-    console.log("🔢 Raqamlar o'yini boshlandi...");
-    
-    const numbersCount = parseInt(document.getElementById('numbers-count').value);
-    timeLimit = parseInt(document.getElementById('numbers-time').value);
-    
-    console.log("📊 Sozlamalar:", { numbersCount, timeLimit });
-    
-    // Tasodifiy raqamlarni yaratish
-    numbersToMemorize = generateRandomNumbers(numbersCount);
-    console.log("🎲 Yaratilgan raqamlar:", numbersToMemorize);
-    
-    // Raqamlarni ko'rsatish
-    document.getElementById('numbers-display').textContent = numbersToMemorize.join(' ');
-    
-    // Vaqtni sozlash
-    timeLeft = timeLimit;
-    document.getElementById('numbers-timer').textContent = timeLeft;
-    console.log("⏰ Taymer sozlandi:", timeLeft + " sekund");
-    
-    // Eslab qolish sahifasiga o'tish
-    showSection('numbers-memorization');
-    
-    // Taymerni ishga tushirish
-    clearInterval(timer);
-    timer = setInterval(updateNumbersTimer, 1000);
-    console.log("✅ Taymer ishga tushdi");
-}
+// DOM yuklanganda
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("✅ Memory Master ishga tushdi!");
+    checkUserLogin();
+    setupEventListeners();
+});
 
-function updateNumbersTimer() {
-    timeLeft--;
-    console.log("⏰ Vaqt:", timeLeft);
-    document.getElementById('numbers-timer').textContent = timeLeft;
+// Foydalanuvchi login holatini tekshirish
+function checkUserLogin() {
+    const savedUser = localStorage.getItem('memoryMasterUser');
+    console.log("📊 Saqlangan foydalanuvchi:", savedUser);
     
-    if (timeLeft <= 0) {
-        console.log("⏰ Vaqt tugadi! Kirish sahifasiga o'tilmoqda...");
-        clearInterval(timer);
-        showNumbersInputSection();
+    if (savedUser) {
+        currentUser = JSON.parse(savedUser);
+        console.log("👤 Foydalanuvchi topildi:", currentUser);
+        showSection('dashboard');
+        updateProfileDisplay();
+    } else {
+        console.log("❌ Foydalanuvchi topilmadi, login sahifasida");
+        showSection('login-section');
     }
 }
 
-function showNumbersInputSection() {
-    console.log("⌨️ Kirish sahifasiga o'tilmoqda...");
-    showSection('numbers-input');
+// Event listenerlarni o'rnatish
+function setupEventListeners() {
+    console.log("🎯 Event listenerlar o'rnatilmoqda...");
     
-    // Kirish maydonlarini yaratish
-    const inputGrid = document.getElementById('numbers-input-grid');
-    inputGrid.innerHTML = '';
-    
-    for (let i = 0; i < numbersToMemorize.length; i++) {
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.className = 'number-input';
-        input.maxLength = 1;
-        input.dataset.index = i;
-        
-        // Enter bosganda keyingi katakka o'tish
-        input.addEventListener('keyup', function(e) {
-            if (e.key === 'Enter' || this.value.length === 1) {
-                const nextIndex = parseInt(this.dataset.index) + 1;
-                const nextInput = document.querySelector(`.number-input[data-index="${nextIndex}"]`);
-                if (nextInput) {
-                    nextInput.focus();
-                }
-            }
-        });
-        
-        inputGrid.appendChild(input);
+    // Avatar yuklash
+    const avatarInput = document.getElementById('avatar-input');
+    if (avatarInput) {
+        avatarInput.addEventListener('change', handleAvatarUpload);
+        console.log("✅ Avatar input listener o'rnatildi");
     }
     
-    // Birinchi katakni fokus qilish
-    const firstInput = document.querySelector('.number-input');
-    if (firstInput) {
-        firstInput.focus();
-        console.log("✅ Birinchi katak fokuslandi");
+    // Profil yaratish tugmasi
+    const createProfileBtn = document.querySelector('.btn-primary');
+    if (createProfileBtn) {
+        createProfileBtn.addEventListener('click', createProfile);
+        console.log("✅ Profil yaratish tugmasi listener o'rnatildi");
     }
 }
 
-function checkNumbersAnswers() {
-    console.log("📝 Javoblarni tekshirish...");
-    
-    const inputs = document.querySelectorAll('.number-input');
-    const resultsList = document.getElementById('numbers-results-list');
-    resultsList.innerHTML = '';
-    
-    let correctCount = 0;
-    let incorrectCount = 0;
-    
-    for (let i = 0; i < inputs.length; i++) {
-        const userAnswer = inputs[i].value.trim();
-        const correctAnswer = numbersToMemorize[i].toString();
-        
-        console.log(`❓ ${i + 1}. Foydalanuvchi: ${userAnswer}, To'g'ri: ${correctAnswer}`);
-        
-        const resultItem = document.createElement('div');
-        resultItem.className = 'result-item';
-        
-        if (userAnswer === correctAnswer) {
-            resultItem.innerHTML = `<span class="correct">${i + 1}. ${userAnswer}</span>`;
-            correctCount++;
-            console.log(`✅ ${i + 1}. To'g'ri`);
-        } else {
-            resultItem.innerHTML = `
-                <span class="incorrect">${i + 1}. ${userAnswer}</span>
-                <span class="correct-answer">${correctAnswer}</span>
-            `;
-            incorrectCount++;
-            console.log(`❌ ${i + 1}. Xato`);
-        }
-        
-        resultsList.appendChild(resultItem);
+// Avatar yuklash
+function handleAvatarUpload(e) {
+    const file = e.target.files[0];
+    if (file) {
+        console.log("🖼️ Rasm yuklanmoqda:", file.name);
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('avatar-preview').innerHTML = 
+                `<img src="${e.target.result}" alt="Profil rasmi" style="width:100%;height:100%;border-radius:50%;">`;
+            console.log("✅ Rasm yuklandi");
+        };
+        reader.readAsDataURL(file);
     }
-    
-    // Statistika
-    document.getElementById('numbers-correct-count').textContent = correctCount;
-    document.getElementById('numbers-incorrect-count').textContent = incorrectCount;
-    document.getElementById('numbers-accuracy').textContent = `${Math.round((correctCount / numbersToMemorize.length) * 100)}%`;
-    
-    console.log("📊 Natijalar:", { correctCount, incorrectCount, accuracy: Math.round((correctCount / numbersToMemorize.length) * 100) + '%' });
-    
-    // Tarixga qo'shish
-    addToHistory('Raqamlar', correctCount, incorrectCount, numbersToMemorize.length);
-    
-    // Natijalar bo'limini ko'rsatish
-    showSection('numbers-results');
-    console.log("🎯 Natijalar sahifasiga o'tildi");
 }
 
-// Yordamchi funksiyalar
-function generateRandomNumbers(count) {
-    const numbers = [];
-    for (let i = 0; i < count; i++) {
-        numbers.push(Math.floor(Math.random() * 10));
-    }
-    return numbers;
-}
+// Profil yaratish - ASOSIY FUNKSIYA
+function createProfile() {
+    console.log("🚀 Profil yaratish boshlandi...");
+    
+    const name = document.getElementById('user-name').value.trim();
+    const surname = document.getElementById('user-surname').value.trim();
+    const avatarPreview = document.getElementById('avatar-preview');
+    const avatarImg = avatarPreview.querySelector('img');
+    
+    console.log("📝 Ism:", name);
+    console.log("📝 Familiya:", surname);
+    console.log("🖼️ Avatar:", avatarImg ? "Mavjud" : "Yo'q");
 
-function addToHistory(category, correct, incorrect, total) {
-    const testResult = {
+    // Validatsiya
+    if (!name || !surname) {
+        alert('⚠️ Iltimos, ism va familiyangizni kiriting!');
+        console.log("❌ Ism yoki familiya kiritilmagan");
+        return;
+    }
+
+    // Foydalanuvchi yaratish
+    currentUser = {
         id: Date.now(),
-        date: new Date().toLocaleString('uz-UZ'),
-        category: category,
-        correct: correct,
-        incorrect: incorrect,
-        total: total,
-        accuracy: Math.round((correct / total) * 100)
+        name: name,
+        surname: surname,
+        avatar: avatarImg ? avatarImg.src : null,
+        joinDate: new Date().toLocaleDateString('uz-UZ'),
+        stats: {
+            totalTests: 0,
+            totalWords: 0,
+            successRate: 0,
+            numbersBest: 0,
+            wordsBest: 0,
+            flashcardsLearned: 0,
+            facesMemorized: 0,
+            imagesRemembered: 0
+        }
     };
     
-    // Tarixni saqlash
-    let testHistory = JSON.parse(localStorage.getItem('memoryMasterHistory') || '[]');
-    testHistory.unshift(testResult);
-    localStorage.setItem('memoryMasterHistory', JSON.stringify(testHistory));
+    console.log("👤 Yangi foydalanuvchi:", currentUser);
     
-    console.log("💾 Tarixga qo'shildi:", testResult);
-}
-// ==================== SO'ZLAR FUNCTIONS ====================
-
-function startWordsGame() {
-    console.log("🔤 So'zlar o'yini boshlandi...");
+    // LocalStorage ga saqlash
+    try {
+        localStorage.setItem('memoryMasterUser', JSON.stringify(currentUser));
+        console.log("💾 Foydalanuvchi saqlandi");
+    } catch (error) {
+        console.error("❌ Saqlash xatosi:", error);
+        alert('Xatolik yuz berdi!');
+        return;
+    }
     
-    const wordCount = parseInt(document.getElementById('word-count').value);
-    timeLimit = parseInt(document.getElementById('word-time').value);
-    const language = document.getElementById('word-language').value;
-    
-    console.log("📊 Sozlamalar:", { wordCount, timeLimit, language });
-    
-    // Tasodifiy so'zlarni tanlash
-    wordsToMemorize = getRandomWords(wordCount, language);
-    console.log("📝 Tanlangan so'zlar:", wordsToMemorize);
-    
-    // So'zlarni ko'rsatish
-    document.getElementById('words-display').textContent = wordsToMemorize.join(', ');
-    
-    // Vaqtni sozlash
-    timeLeft = timeLimit;
-    document.getElementById('words-timer').textContent = timeLeft;
-    console.log("⏰ Taymer sozlandi:", timeLeft + " sekund");
-    
-    // Eslab qolish sahifasiga o'tish
-    showSection('words-memorization');
-    
-    // Taymerni ishga tushirish
-    clearInterval(timer);
-    timer = setInterval(updateWordsTimer, 1000);
-    console.log("✅ Taymer ishga tushdi");
+    // Dashboardga o'tish
+    showSection('dashboard');
+    updateProfileDisplay();
+    console.log("✅ Profil muvaffaqiyatli yaratildi!");
 }
 
-function updateWordsTimer() {
-    timeLeft--;
-    console.log("⏰ Vaqt:", timeLeft);
-    document.getElementById('words-timer').textContent = timeLeft;
+// Sahifalarni ko'rsatish
+function showSection(sectionId) {
+    console.log("🔄 Sahifaga o'tish:", sectionId);
     
-    if (timeLeft <= 0) {
-        console.log("⏰ Vaqt tugadi! Kirish sahifasiga o'tilmoqda...");
-        clearInterval(timer);
-        showWordsInputSection();
+    // Barcha sahifalarni yashirish
+    document.querySelectorAll('.section').forEach(section => {
+        section.classList.remove('active');
+    });
+    
+    // Tanlangan sahifani ko'rsatish
+    const targetSection = document.getElementById(sectionId);
+    if (targetSection) {
+        targetSection.classList.add('active');
+        currentSection = sectionId;
+        console.log("✅ Sahifa ko'rsatildi:", sectionId);
+    } else {
+        console.error("❌ Sahifa topilmadi:", sectionId);
     }
 }
 
-function showWordsInputSection() {
-    console.log("⌨️ So'zlar kirish sahifasiga o'tilmoqda...");
-    showSection('words-input');
-    
-    // Kirish maydonlarini yaratish
-    const wordInputsContainer = document.getElementById('word-inputs-container');
-    wordInputsContainer.innerHTML = '';
-    
-    for (let i = 0; i < wordsToMemorize.length; i++) {
-        const inputGroup = document.createElement('div');
-        inputGroup.className = 'form-group';
-        
-        const label = document.createElement('label');
-        label.textContent = `${i + 1}. so'z:`;
-        label.style.color = 'white';
-        
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.className = 'word-input';
-        input.placeholder = `${i + 1}-so'zni kiriting`;
-        
-        inputGroup.appendChild(label);
-        inputGroup.appendChild(input);
-        wordInputsContainer.appendChild(inputGroup);
+// Profilni yangilash
+function updateProfileDisplay() {
+    if (!currentUser) {
+        console.log("❌ Foydalanuvchi yo'q");
+        return;
     }
     
-    console.log("✅ So'z kirish maydonlari yaratildi");
-}
-
-function checkWordsAnswers() {
-    console.log("📝 So'z javoblarini tekshirish...");
+    console.log("🔄 Profil yangilanmoqda...");
     
-    const inputs = document.querySelectorAll('.word-input');
-    const resultsList = document.getElementById('words-results-list');
-    resultsList.innerHTML = '';
+    // Ism-familiya
+    const fullnameElement = document.getElementById('user-fullname');
+    if (fullnameElement) {
+        fullnameElement.textContent = `${currentUser.name} ${currentUser.surname}`;
+        console.log("✅ Ism yangilandi:", fullnameElement.textContent);
+    }
     
-    let correctCount = 0;
-    let incorrectCount = 0;
-    
-    for (let i = 0; i < inputs.length; i++) {
-        const userAnswer = inputs[i].value.trim().toLowerCase();
-        const correctAnswer = wordsToMemorize[i].toLowerCase();
-        
-        console.log(`❓ ${i + 1}. Foydalanuvchi: "${userAnswer}", To'g'ri: "${correctAnswer}"`);
-        
-        const resultItem = document.createElement('div');
-        resultItem.className = 'result-item';
-        
-        if (userAnswer === correctAnswer) {
-            resultItem.innerHTML = `<span class="correct">${i + 1}. ${userAnswer}</span>`;
-            correctCount++;
-            console.log(`✅ ${i + 1}. To'g'ri`);
+    // Avatar
+    const userAvatar = document.getElementById('user-avatar');
+    if (userAvatar) {
+        if (currentUser.avatar) {
+            userAvatar.innerHTML = `<img src="${currentUser.avatar}" alt="Profil rasmi" style="width:100%;height:100%;border-radius:50%;">`;
+            console.log("✅ Avatar yangilandi (rasm)");
         } else {
-            resultItem.innerHTML = `
-                <span class="incorrect">${i + 1}. ${userAnswer}</span>
-                <span class="correct-answer">${correctAnswer}</span>
-            `;
-            incorrectCount++;
-            console.log(`❌ ${i + 1}. Xato`);
+            userAvatar.innerHTML = '<i class="fas fa-user-circle"></i>';
+            console.log("✅ Avatar yangilandi (default)");
         }
-        
-        resultsList.appendChild(resultItem);
     }
     
     // Statistika
-    document.getElementById('words-correct-count').textContent = correctCount;
-    document.getElementById('words-incorrect-count').textContent = incorrectCount;
-    document.getElementById('words-accuracy').textContent = `${Math.round((correctCount / wordsToMemorize.length) * 100)}%`;
+    const totalTestsElement = document.getElementById('total-tests');
+    const totalWordsElement = document.getElementById('total-words');
+    const successRateElement = document.getElementById('success-rate');
     
-    console.log("📊 So'z natijalari:", { correctCount, incorrectCount, accuracy: Math.round((correctCount / wordsToMemorize.length) * 100) + '%' });
+    if (totalTestsElement) totalTestsElement.textContent = `${currentUser.stats.totalTests} test`;
+    if (totalWordsElement) totalWordsElement.textContent = `${currentUser.stats.totalWords} so'z`;
+    if (successRateElement) successRateElement.textContent = `${currentUser.stats.successRate}% muvaffaqiyat`;
     
-    // Tarixga qo'shish
-    addToHistory('So\'zlar', correctCount, incorrectCount, wordsToMemorize.length);
-    
-    // Natijalar bo'limini ko'rsatish
-    showSection('words-results');
-    console.log("🎯 So'z natijalar sahifasiga o'tildi");
+    console.log("✅ Statistika yangilandi");
 }
 
-function getRandomWords(count, language) {
-    const words = [...wordDatabase[language]];
-    const selectedWords = [];
+// Chiqish
+function logout() {
+    console.log("🚪 Chiqish...");
     
-    for (let i = 0; i < count; i++) {
-        if (words.length === 0) break;
-        const randomIndex = Math.floor(Math.random() * words.length);
-        selectedWords.push(words[randomIndex]);
-        words.splice(randomIndex, 1);
-    }
+    currentUser = null;
+    localStorage.removeItem('memoryMasterUser');
     
-    return selectedWords;
+    // Formani tozalash
+    document.getElementById('user-name').value = '';
+    document.getElementById('user-surname').value = '';
+    document.getElementById('avatar-preview').innerHTML = '<i class="fas fa-user-circle"></i>';
+    
+    showSection('login-section');
+    console.log("✅ Muvaffaqiyatli chiqildi");
 }
+
 // Global funksiyalar
 window.showSection = showSection;
 window.createProfile = createProfile;
 window.logout = logout;
+window.handleAvatarUpload = handleAvatarUpload;
+
+// Avatar yuklash uchun
 window.uploadAvatar = function() {
     document.getElementById('avatar-input').click();
 };
 
-// Raqamlar funksiyalari
-window.startNumbersGame = startNumbersGame;
-window.checkNumbersAnswers = checkNumbersAnswers;
-
-// So'zlar funksiyalari  
-window.startWordsGame = startWordsGame;
-window.checkWordsAnswers = checkWordsAnswers;
+console.log("🎉 app.js to'liq yuklandi!");
