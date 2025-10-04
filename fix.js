@@ -1,52 +1,89 @@
-// fix.js - Muammolarni tuzatish
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('Memory Master - Fix script loaded');
-    
-    // Loading screen ni tekshirish
-    const loadingScreen = document.getElementById('loading');
-    if (loadingScreen) {
-        setTimeout(() => {
-            loadingScreen.classList.add('fade-out');
-            setTimeout(() => {
-                loadingScreen.style.display = 'none';
-            }, 500);
-        }, 1000);
-    }
-    
-    // App ni ishga tushirish
-    if (typeof GameApp !== 'undefined') {
-        setTimeout(() => {
-            window.gameApp = new GameApp();
-        }, 100);
-    } else {
-        console.error('GameApp not found!');
-        // Emergency fallback
-        showEmergencyMenu();
-    }
-});
-
-// Emergency fallback menu
-function showEmergencyMenu() {
-    const emergencyHTML = `
-        <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; z-index: 10000;">
-            <div style="background: rgba(255,255,255,0.1); padding: 2rem; border-radius: 20px; text-align: center; backdrop-filter: blur(10px); color: white;">
-                <h1 style="margin-bottom: 1rem;">🧠 Memory Master</h1>
-                <p style="margin-bottom: 2rem;">Saytda texnik muammo yuz berdi. Iltimos, qayta yuklang.</p>
-                <button onclick="location.reload()" style="background: white; color: #667eea; border: none; padding: 12px 24px; border-radius: 10px; cursor: pointer; font-weight: bold;">
-                    🔄 Qayta Yuklash
-                </button>
-            </div>
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <title>Memory Master - Fixed Version</title>
+    <style>
+        /* Asosiy stillar */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        .game-btn {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 20px;
+            margin: 10px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s;
+        }
+        
+        .game-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧠 Memory Master</h1>
+        <p>Xotira va aql o'yinlari platformasi</p>
+        
+        <div style="margin: 40px 0;">
+            <button class="game-btn" onclick="startGame('numbers')">
+                🔢 Raqamlar
+            </button>
+            <button class="game-btn" onclick="startGame('words')">
+                📝 So'zlar
+            </button>
+            <button class="game-btn" onclick="startGame('flashcards')">
+                🎴 Flash Kartalar
+            </button>
         </div>
-    `;
-    
-    document.body.innerHTML = emergencyHTML;
-}
+        
+        <div id="game-area"></div>
+    </div>
 
-// Console da ma'lumot berish
-console.log(`
-🧠 Memory Master Debug Info:
-📍 URL: ${window.location.href}
-📁 Path: ${window.location.pathname}
-🔧 User Agent: ${navigator.userAgent}
-💾 Storage: ${typeof localStorage !== 'undefined' ? 'Available' : 'Not Available'}
-`);
+    <script>
+        function startGame(type) {
+            const area = document.getElementById('game-area');
+            
+            if (type === 'numbers') {
+                area.innerHTML = `
+                    <div style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 16px; margin-top: 20px;">
+                        <h3>🔢 Raqamlar O'yini</h3>
+                        <p>3 ta raqamni eslab qoling:</p>
+                        <div style="font-size: 2rem; margin: 20px 0;">7 2 9</div>
+                        <button onclick="checkAnswer()" style="background: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;">
+                            Ko'rsatishni tugatish
+                        </button>
+                    </div>
+                `;
+            }
+            // ... boshqa o'yinlar
+        }
+        
+        function checkAnswer() {
+            const answer = prompt('Raqamlarni ketma-ketlikda kiriting (masalan: 7 2 9):');
+            if (answer === '7 2 9') {
+                alert('🎉 Toʻgʻri! Ajoyib xotira!');
+            } else {
+                alert('❌ Notoʻgʻri! Toʻgʻri javob: 7 2 9');
+            }
+        }
+    </script>
+</body>
+</html>
