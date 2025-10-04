@@ -3,65 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Memory Master - Aqlingizni Sinab Ko'ring</title>
+    <title>Memory Master</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* ASOSIY STILLAR */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --secondary: #10b981;
-            --accent: #f59e0b;
-            --danger: #ef4444;
-            --success: #22c55e;
-            
-            --bg-primary: #0f172a;
-            --bg-secondary: #1e293b;
-            --bg-card: #334155;
-            --text-primary: #f8fafc;
-            --text-secondary: #cbd5e1;
-            --text-muted: #64748b;
-            
-            --border-radius: 16px;
-            --border-radius-sm: 8px;
-            --shadow: 0 10px 25px rgba(0,0,0,0.3);
-            --shadow-lg: 0 25px 50px rgba(0,0,0,0.4);
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
         body {
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, var(--bg-primary) 0%, #1e1b4b 100%);
-            color: var(--text-primary);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
             min-height: 100vh;
-            overflow-x: hidden;
         }
 
-        /* LOADING SCREEN */
+        /* LOADING */
         .loading-screen {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: var(--bg-primary);
+            background: #0f172a;
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 9999;
-            transition: opacity 0.5s ease;
-        }
-
-        .loading-screen.fade-out {
-            opacity: 0;
-            pointer-events: none;
         }
 
         .loading-content {
@@ -70,7 +39,7 @@
 
         .brain-loader {
             font-size: 4rem;
-            color: var(--primary);
+            color: #6366f1;
             margin-bottom: 1rem;
             animation: pulse 2s infinite;
         }
@@ -80,585 +49,214 @@
             50% { transform: scale(1.1); }
         }
 
-        /* WELCOME MODAL - BIRINCHI KO'RINADI */
+        /* WELCOME MODAL */
         #welcome-modal {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0,0,0,0.8);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 1000;
         }
 
-        #welcome-modal.active {
-            display: flex;
-        }
-
         .welcome-modal {
-            background: var(--bg-secondary);
-            border-radius: var(--border-radius);
-            padding: 0;
+            background: #1e293b;
+            border-radius: 16px;
+            padding: 2rem;
             max-width: 500px;
             width: 90%;
-            box-shadow: var(--shadow-lg);
-        }
-
-        .welcome-header {
-            padding: 2rem 2rem 1rem;
             text-align: center;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
 
         .welcome-icon {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 1rem;
-            font-size: 2rem;
-        }
-
-        .welcome-body {
-            padding: 2rem;
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            color: #6366f1;
         }
 
         .input-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: var(--text-secondary);
-            font-weight: 500;
+            margin: 2rem 0;
         }
 
         .input-group input {
             width: 100%;
             padding: 1rem;
             border: 2px solid rgba(255,255,255,0.2);
-            border-radius: var(--border-radius-sm);
+            border-radius: 8px;
             background: rgba(255,255,255,0.1);
-            color: var(--text-primary);
+            color: white;
             font-size: 1rem;
-            transition: var(--transition);
-        }
-
-        .input-group input:focus {
-            outline: none;
-            border-color: var(--primary);
-            background: rgba(255,255,255,0.15);
-        }
-
-        .avatar-selection {
-            margin-bottom: 2rem;
-        }
-
-        .avatar-selection label {
-            display: block;
-            margin-bottom: 1rem;
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
-
-        .avatars-grid {
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 0.5rem;
-        }
-
-        .avatar-option {
-            width: 50px;
-            height: 50px;
-            border: 2px solid rgba(255,255,255,0.2);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: var(--transition);
-            font-size: 1.5rem;
-        }
-
-        .avatar-option.active {
-            border-color: var(--primary);
-            background: rgba(99, 102, 241, 0.2);
-            transform: scale(1.1);
-        }
-
-        .avatar-option:hover {
-            border-color: var(--primary);
-            transform: scale(1.05);
         }
 
         .welcome-btn {
             width: 100%;
             padding: 1rem 2rem;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            background: #6366f1;
             color: white;
             border: none;
-            border-radius: var(--border-radius);
+            border-radius: 12px;
             font-size: 1.1rem;
-            font-weight: 600;
             cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
         }
 
-        .welcome-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow);
-        }
-
-        /* ASOSIY KONTEYNER */
+        /* MAIN APP */
         .main-container {
-            display: none; /* Avval yashirin */
+            display: none;
             min-height: 100vh;
-            flex-direction: column;
         }
 
-        .main-container.active {
-            display: flex;
-        }
-
-        /* HEADER */
         .main-header {
-            background: rgba(30, 41, 59, 0.8);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(30,41,59,0.8);
             padding: 1rem 2rem;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .header-content {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            max-width: 1200px;
-            margin: 0 auto;
         }
 
         .logo {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-        }
-
-        .logo i {
-            font-size: 2rem;
-            color: var(--primary);
-        }
-
-        .logo h1 {
+            gap: 0.5rem;
             font-size: 1.5rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            font-weight: bold;
         }
 
         .profile-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: var(--text-primary);
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
             padding: 0.5rem 1rem;
-            border-radius: var(--border-radius-sm);
+            border-radius: 8px;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: var(--transition);
         }
 
-        .profile-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
-        }
-
-        /* MAIN CONTENT */
         .main-content {
-            flex: 1;
             padding: 2rem;
             max-width: 1200px;
             margin: 0 auto;
-            width: 100%;
         }
 
-        /* SECTION MANAGEMENT */
+        /* SECTIONS */
         section {
             display: none;
         }
 
         section.active {
             display: block;
-            animation: fadeInUp 0.6s ease;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
         }
 
         /* WELCOME SECTION */
         .welcome-section {
             text-align: center;
-            padding: 2rem 0;
+            padding: 4rem 2rem;
         }
 
-        .welcome-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4rem;
-            align-items: center;
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-
-        .welcome-text h2 {
+        .welcome-section h2 {
             font-size: 3rem;
-            font-weight: 700;
             margin-bottom: 1rem;
-            line-height: 1.2;
-        }
-
-        .highlight {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .welcome-text p {
-            font-size: 1.2rem;
-            color: var(--text-secondary);
-            margin-bottom: 2rem;
-            line-height: 1.6;
-        }
-
-        .stats-preview {
-            display: flex;
-            gap: 2rem;
-            margin-bottom: 2rem;
-            justify-content: center;
-        }
-
-        .stat-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--text-secondary);
-        }
-
-        .stat-item i {
-            color: var(--primary);
         }
 
         .cta-button {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            background: #6366f1;
             color: white;
             border: none;
             padding: 1rem 2rem;
-            border-radius: var(--border-radius);
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.75rem;
-            transition: var(--transition);
-            box-shadow: var(--shadow);
-        }
-
-        .cta-button:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        /* GAME MODES SECTION */
-        .game-modes-section {
-            padding: 2rem 0;
-        }
-
-        .section-header {
-            text-align: center;
-            margin-bottom: 3rem;
-        }
-
-        .section-header h2 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .section-header p {
-            color: var(--text-secondary);
-            font-size: 1.1rem;
-        }
-
-        .modes-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .mode-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: var(--border-radius);
-            padding: 2rem;
-            cursor: pointer;
-            transition: var(--transition);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .mode-card:hover {
-            transform: translateY(-5px);
-            border-color: rgba(255, 255, 255, 0.3);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .mode-icon {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 1rem;
-            font-size: 1.5rem;
-        }
-
-        .mode-content h3 {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-
-        .mode-content p {
-            color: var(--text-secondary);
-            margin-bottom: 1rem;
-            line-height: 1.5;
-        }
-
-        .mode-stats {
-            display: flex;
-            gap: 1rem;
-            font-size: 0.9rem;
-            color: var(--text-muted);
-        }
-
-        .mode-stats i {
-            margin-right: 0.25rem;
-        }
-
-        .mode-badge {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: var(--secondary);
-            color: white;
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 500;
-        }
-
-        .section-footer {
-            text-align: center;
+            font-size: 1.1rem;
+            cursor: pointer;
             margin-top: 2rem;
         }
 
-        .back-button {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: var(--text-primary);
-            padding: 0.75rem 1.5rem;
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: var(--transition);
+        /* GAME MODES */
+        .modes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
         }
 
-        .back-button:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
+        .mode-card {
+            background: rgba(255,255,255,0.1);
+            padding: 2rem;
+            border-radius: 16px;
+            cursor: pointer;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+
+        .mode-card:hover {
+            background: rgba(255,255,255,0.2);
         }
 
         /* GAME AREA */
-        .game-area-section {
-            padding: 1rem 0;
-        }
-
         .game-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 2rem;
             padding: 1rem;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: var(--border-radius);
-            backdrop-filter: blur(10px);
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
         }
 
-        .game-info {
-            display: flex;
-            gap: 2rem;
-        }
-
-        .info-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--text-secondary);
-        }
-
-        .info-item i {
-            color: var(--primary);
-        }
-
-        .info-item strong {
-            color: var(--text-primary);
-            font-weight: 600;
+        .back-button {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
         }
 
         .game-content {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: var(--border-radius);
+            background: rgba(255,255,255,0.1);
             padding: 2rem;
+            border-radius: 16px;
             min-height: 400px;
         }
 
-        /* RESULTS SECTION - FAQAT O'YINDAN KEYIN KO'RINADI */
-        .results-section {
-            padding: 2rem 0;
-            display: none; /* Boshlanishida yashirin */
+        /* NUMBERS GAME */
+        .numbers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
         }
 
-        .results-section.active {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .results-container {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: var(--border-radius);
-            padding: 3rem;
+        .number-card {
+            background: rgba(255,255,255,0.2);
+            padding: 2rem 1rem;
+            border-radius: 12px;
             text-align: center;
-            max-width: 500px;
-            width: 100%;
+            font-size: 1.5rem;
         }
 
-        .results-header {
-            margin-bottom: 2rem;
-        }
-
-        .result-icon {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, var(--success), #16a34a);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 1rem;
-            font-size: 2rem;
-        }
-
-        .results-stats {
+        .number-pad {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .stat-card {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 1.5rem 1rem;
-            border-radius: var(--border-radius);
-        }
-
-        .stat-value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-label {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-
-        .results-message {
-            margin-bottom: 2rem;
-        }
-
-        .results-actions {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-        }
-
-        .action-button {
-            padding: 1rem 2rem;
-            border: none;
-            border-radius: var(--border-radius);
-            font-weight: 600;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
             gap: 0.5rem;
-            transition: var(--transition);
+            max-width: 200px;
+            margin: 2rem auto;
         }
 
-        .action-button.primary {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        .number-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.3);
             color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2rem;
         }
 
-        .action-button.secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text-primary);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .action-button:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow);
+        /* RESULTS - BOSHLANISHDA YASHIRIN */
+        .results-section {
+            display: none;
+            text-align: center;
+            padding: 4rem 2rem;
         }
 
         /* PROFILE MODAL */
@@ -669,189 +267,42 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0,0,0,0.8);
+            align-items: center;
+            justify-content: center;
             z-index: 1000;
         }
 
         #profile-modal.active {
             display: flex;
-            align-items: center;
-            justify-content: center;
         }
 
         .modal-content {
-            background: var(--bg-secondary);
-            border-radius: var(--border-radius);
-            padding: 0;
+            background: #1e293b;
+            border-radius: 16px;
+            padding: 2rem;
             max-width: 500px;
             width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: var(--shadow-lg);
         }
 
         .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1.5rem 2rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .modal-header h3 {
-            font-size: 1.5rem;
-            font-weight: 600;
+            margin-bottom: 1rem;
         }
 
         .close-modal {
             background: none;
             border: none;
-            color: var(--text-secondary);
+            color: white;
             font-size: 1.5rem;
             cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .close-modal:hover {
-            color: var(--text-primary);
-        }
-
-        .modal-body {
-            padding: 2rem;
-        }
-
-        .profile-info {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .avatar {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-        }
-
-        .user-details h4 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-        }
-
-        .user-details p {
-            color: var(--text-secondary);
-        }
-
-        .profile-stats h4 {
-            margin-bottom: 1rem;
-            font-size: 1.1rem;
-            font-weight: 600;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
-        }
-
-        .stat {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 1rem;
-            border-radius: var(--border-radius-sm);
-            text-align: center;
-        }
-
-        .stat-number {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 0.25rem;
-        }
-
-        .stat-label {
-            color: var(--text-secondary);
-            font-size: 0.8rem;
-        }
-
-        /* RESPONSIVE DESIGN */
-        @media (max-width: 768px) {
-            .main-content {
-                padding: 1rem;
-            }
-            
-            .welcome-content {
-                grid-template-columns: 1fr;
-                gap: 2rem;
-                text-align: center;
-            }
-            
-            .welcome-text h2 {
-                font-size: 2rem;
-            }
-            
-            .stats-preview {
-                flex-direction: column;
-                gap: 1rem;
-            }
-            
-            .modes-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .game-header {
-                flex-direction: column;
-                gap: 1rem;
-            }
-            
-            .game-info {
-                gap: 1rem;
-            }
-            
-            .results-stats {
-                grid-template-columns: 1fr;
-            }
-            
-            .results-actions {
-                flex-direction: column;
-            }
-            
-            .section-header h2 {
-                font-size: 2rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .header-content {
-                flex-direction: column;
-                gap: 1rem;
-            }
-            
-            .logo h1 {
-                font-size: 1.25rem;
-            }
-            
-            .welcome-text h2 {
-                font-size: 1.75rem;
-            }
-            
-            .modal-content {
-                width: 95%;
-            }
-            
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
         }
     </style>
 </head>
 <body>
-    <!-- LOADING SCREEN -->
+    <!-- 1. LOADING SCREEN -->
     <div id="loading" class="loading-screen">
         <div class="loading-content">
             <div class="brain-loader">
@@ -862,294 +313,425 @@
         </div>
     </div>
 
-    <!-- WELCOME MODAL - BIRINCHI KO'RINADI -->
-    <div id="welcome-modal" class="active">
-        <div class="modal-content welcome-modal">
-            <div class="welcome-header">
-                <div class="welcome-icon">
-                    <i class="fas fa-brain"></i>
-                </div>
-                <h2>Memory Master ga Xush Kelibsiz!</h2>
-                <p>O'yinga kirish uchun ismingizni kiriting</p>
+    <!-- 2. WELCOME MODAL - BIRINCHI KO'RINADI -->
+    <div id="welcome-modal">
+        <div class="welcome-modal">
+            <div class="welcome-icon">
+                <i class="fas fa-brain"></i>
+            </div>
+            <h2>Memory Master ga Xush Kelibsiz!</h2>
+            <p>O'yinga kirish uchun ismingizni kiriting</p>
+            
+            <div class="input-group">
+                <input type="text" id="user-name-input" placeholder="Ismingizni kiriting..." maxlength="20">
             </div>
             
-            <div class="welcome-body">
-                <div class="input-group">
-                    <label for="user-name-input">Ismingiz</label>
-                    <input type="text" id="user-name-input" placeholder="Ismingizni kiriting..." maxlength="20">
-                </div>
-                
-                <div class="avatar-selection">
-                    <label>Profil rasmini tanlang:</label>
-                    <div class="avatars-grid">
-                        <div class="avatar-option active" data-avatar="👦">
-                            <span>👦</span>
-                        </div>
-                        <div class="avatar-option" data-avatar="👧">
-                            <span>👧</span>
-                        </div>
-                        <div class="avatar-option" data-avatar="🧑">
-                            <span>🧑</span>
-                        </div>
-                        <div class="avatar-option" data-avatar="👨">
-                            <span>👨</span>
-                        </div>
-                        <div class="avatar-option" data-avatar="👩">
-                            <span>👩</span>
-                        </div>
-                        <div class="avatar-option" data-avatar="🦸">
-                            <span>🦸</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <button id="start-game-btn" class="welcome-btn">
-                    <i class="fas fa-play"></i>
-                    O'yinni Boshlash
-                </button>
-            </div>
+            <button id="start-game-btn" class="welcome-btn">
+                <i class="fas fa-play"></i>
+                O'yinni Boshlash
+            </button>
         </div>
     </div>
 
-    <!-- ASOSIY KONTEYNER - AVVAL YASHIRIN -->
+    <!-- 3. ASOSIY APP - AVVAL YASHIRIN -->
     <div class="main-container">
         <!-- Header -->
         <header class="main-header">
-            <div class="header-content">
-                <div class="logo">
-                    <i class="fas fa-brain"></i>
-                    <h1>Memory Master</h1>
-                </div>
-                <div class="user-section">
-                    <button id="profile-btn" class="profile-btn">
-                        <i class="fas fa-user"></i>
-                        <span>Profil</span>
-                    </button>
-                </div>
+            <div class="logo">
+                <i class="fas fa-brain"></i>
+                <span>Memory Master</span>
             </div>
+            <button id="profile-btn" class="profile-btn">
+                <i class="fas fa-user"></i>
+                Profil
+            </button>
         </header>
 
         <!-- Main Content -->
         <main class="main-content">
             <!-- Welcome Section -->
-            <section id="welcome-section" class="welcome-section active">
-                <div class="welcome-content">
-                    <div class="welcome-text">
-                        <h2>Xush kelibsiz, <span class="highlight" id="welcome-name">Foydalanuvchi</span>!</h2>
-                        <p>Aqlingizning chegaralarini sinab ko'ring va xotirangizni kuchaytiring. Turli o'yinlar orqali miyangizni mashq qiling.</p>
-                        <div class="stats-preview">
-                            <div class="stat-item">
-                                <i class="fas fa-gamepad"></i>
-                                <span>5+ O'yin turi</span>
-                            </div>
-                            <div class="stat-item">
-                                <i class="fas fa-chart-line"></i>
-                                <span>Darajali tizim</span>
-                            </div>
-                            <div class="stat-item">
-                                <i class="fas fa-trophy"></i>
-                                <span>Yutuqlar</span>
-                            </div>
-                        </div>
-                        <button id="start-btn" class="cta-button">
-                            Boshlash
-                            <i class="fas fa-arrow-right"></i>
-                        </button>
-                    </div>
-                    <div class="welcome-visual">
-                        <div class="floating-cards">
-                            <div class="card card-1"><i class="fas fa-1"></i></div>
-                            <div class="card card-2"><i class="fas fa-2"></i></div>
-                            <div class="card card-3"><i class="fas fa-3"></i></div>
-                            <div class="card card-4"><i class="fas fa-a"></i></div>
-                            <div class="card card-5"><i class="fas fa-b"></i></div>
-                            <div class="card card-6"><i class="fas fa-c"></i></div>
-                        </div>
-                    </div>
+            <section id="welcome-section" class="active">
+                <div class="welcome-section">
+                    <h2>Xush kelibsiz, <span id="welcome-name">Foydalanuvchi</span>!</h2>
+                    <p>Aqlingizni sinab ko'ring va xotirangizni kuchaytiring</p>
+                    <button id="start-btn" class="cta-button">
+                        Boshlash <i class="fas fa-arrow-right"></i>
+                    </button>
                 </div>
             </section>
 
             <!-- Game Modes Section -->
-            <section id="game-modes" class="game-modes-section">
-                <div class="section-header">
-                    <h2>O'yin Rejimlari</h2>
-                    <p>Quyidagi o'yinlardan birini tanlang va boshlang</p>
-                </div>
+            <section id="game-modes">
+                <h2>O'yin Rejimlari</h2>
+                <p>Quyidagi o'yinlardan birini tanlang</p>
                 
                 <div class="modes-grid">
-                    <!-- Numbers Game -->
                     <div class="mode-card" data-mode="numbers">
-                        <div class="mode-icon">
-                            <i class="fas fa-sort-numeric-up"></i>
-                        </div>
-                        <div class="mode-content">
-                            <h3>Raqamlar</h3>
-                            <p>Raqamlar ketma-ketligini eslab qoling va takrorlang</p>
-                            <div class="mode-stats">
-                                <span><i class="fas fa-fire"></i> Daraja: 5</span>
-                                <span><i class="fas fa-clock"></i> 2-5 daqiqa</span>
-                            </div>
-                        </div>
-                        <div class="mode-badge">Mashq</div>
+                        <h3>🔢 Raqamlar</h3>
+                        <p>Raqamlar ketma-ketligini eslab qoling</p>
                     </div>
-
-                    <!-- Words Game -->
+                    
                     <div class="mode-card" data-mode="words">
-                        <div class="mode-icon">
-                            <i class="fas fa-font"></i>
-                        </div>
-                        <div class="mode-content">
-                            <h3>So'zlar</h3>
-                            <p>So'zlar ketma-ketligini eslab qoling va takrorlang</p>
-                            <div class="mode-stats">
-                                <span><i class="fas fa-fire"></i> Daraja: 5</span>
-                                <span><i class="fas fa-clock"></i> 3-6 daqiqa</span>
-                            </div>
-                        </div>
-                        <div class="mode-badge">Mashq</div>
+                        <h3>📝 So'zlar</h3>
+                        <p>So'zlar ketma-ketligini eslab qoling</p>
                     </div>
-
-                    <!-- Flashcards -->
+                    
                     <div class="mode-card" data-mode="flashcards">
-                        <div class="mode-icon">
-                            <i class="fas fa-layer-group"></i>
-                        </div>
-                        <div class="mode-content">
-                            <h3>Flash Kartalar</h3>
-                            <p>6 xil tilda so'zlarni o'rganing va yodlang</p>
-                            <div class="mode-stats">
-                                <span><i class="fas fa-fire"></i> 1500+ so'z</span>
-                                <span><i class="fas fa-clock"></i> Cheksiz</span>
-                            </div>
-                        </div>
-                        <div class="mode-badge premium">
-                            <i class="fas fa-crown"></i>
-                            Premium
-                        </div>
+                        <h3>🎴 Flash Kartalar</h3>
+                        <p>6 xil tilda so'zlarni o'rganing</p>
                     </div>
                 </div>
 
-                <div class="section-footer">
-                    <button id="back-to-welcome" class="back-button">
-                        <i class="fas fa-arrow-left"></i>
-                        Orqaga
-                    </button>
-                </div>
+                <button id="back-to-welcome" class="back-button">
+                    <i class="fas fa-arrow-left"></i> Orqaga
+                </button>
             </section>
 
             <!-- Game Area -->
-            <section id="game-area" class="game-area-section">
+            <section id="game-area">
                 <div class="game-header">
                     <button id="game-back-btn" class="back-button">
-                        <i class="fas fa-arrow-left"></i>
-                        Menyuga qaytish
+                        <i class="fas fa-arrow-left"></i> Menyuga qaytish
                     </button>
                     <div class="game-info">
-                        <div class="info-item">
-                            <i class="fas fa-trophy"></i>
-                            <span>Ball: <strong id="current-score">0</strong></span>
-                        </div>
-                        <div class="info-item">
-                            <i class="fas fa-footsteps"></i>
-                            <span>Qadam: <strong id="current-step">0</strong></span>
-                        </div>
-                        <div class="info-item">
-                            <i class="fas fa-clock"></i>
-                            <span>Vaqt: <strong id="game-timer">00:00</strong></span>
-                        </div>
+                        <span>Ball: <strong id="current-score">0</strong></span>
+                        <span>Qadam: <strong id="current-step">0</strong></span>
+                        <span>Vaqt: <strong id="game-timer">00:00</strong></span>
                     </div>
                 </div>
 
                 <div id="game-content" class="game-content">
-                    <!-- O'yin kontenti dinamik ravishda yuklanadi -->
+                    <!-- O'yin kontenti shu yerga yuklanadi -->
                     <div style="text-align: center; padding: 4rem 2rem;">
                         <h3>O'yinni tanlang</h3>
-                        <p>Yuqoridagi menyudan o'yin tanlang va boshlang</p>
+                        <p>Yuqoridagi menyudan o'yin tanlang</p>
                     </div>
                 </div>
             </section>
 
             <!-- Results Section - FAQAT O'YINDAN KEYIN KO'RINADI -->
             <section id="results-section" class="results-section">
-                <div class="results-container">
-                    <div class="results-header">
-                        <div class="result-icon">
-                            <i class="fas fa-trophy"></i>
-                        </div>
-                        <h2>O'yin Yakunlandi!</h2>
-                    </div>
-                    
-                    <div class="results-stats">
-                        <div class="stat-card">
-                            <div class="stat-value" id="final-score">0</div>
-                            <div class="stat-label">Yakuniy Ball</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="final-steps">0</div>
-                            <div class="stat-label">Qadamlar</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="final-time">00:00</div>
-                            <div class="stat-label">Sarflangan Vaqt</div>
-                        </div>
-                    </div>
-
-                    <div class="results-message">
-                        <p id="result-message-text">Ajoyib natija! Siz a'lo darajada o'ynadingiz.</p>
-                    </div>
-
-                    <div class="results-actions">
-                        <button id="play-again-btn" class="action-button primary">
-                            <i class="fas fa-redo"></i>
-                            Yana O'ynash
-                        </button>
-                        <button id="back-to-modes-btn" class="action-button secondary">
-                            <i class="fas fa-th-large"></i>
-                            Boshqa O'yin
-                        </button>
-                    </div>
-                </div>
+                <h2>O'yin Yakunlandi!</h2>
+                <p id="result-message">Ajoyib natija!</p>
+                <button id="play-again-btn" class="cta-button">Yana O'ynash</button>
+                <button id="back-to-modes-btn" class="back-button">Boshqa O'yin</button>
             </section>
         </main>
+    </div>
 
-        <!-- Profile Modal -->
-        <div id="profile-modal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>Foydalanuvchi Profili</h3>
-                    <button class="close-modal">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <div class="profile-info">
-                        <div class="avatar" id="profile-avatar">
-                            <span>👦</span>
-                        </div>
-                        <div class="user-details">
-                            <h4 id="profile-user-name">Foydalanuvchi</h4>
-                            <p>Memory Master</p>
-                        </div>
-                    </div>
-                    
-                    <div class="profile-stats">
-                        <h4>Statistika</h4>
-                        <div class="stats-grid">
-                            <div class="stat">
-                                <div class="stat-number">0</div>
-                                <div class="stat-label">O'ynalgan o'yinlar</div>
-                            </div>
-                            <div class="stat">
-                                <div class="stat-number">0</div>
-                                <div class="stat-label">Yutuqlar</div>
-                            </div>
-                            <div class="stat">
-                                <div class="stat-number">0</div>
-                                <div class="stat-label">Eng yuqori ball</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    <!-- Profile Modal -->
+    <div id="profile-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Foydalanuvchi Profili</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="profile-info">
+                <h4 id="profile-user-name">Foydalanuvchi</h4>
+                <p>Memory Master</p>
             </div>
         </div>
     </div>
 
     <script>
+        // APP LOGIC
+        console.log('🧠 Memory Master - App Starting...');
+
+        class MemoryMaster {
+            constructor() {
+                this.userName = '';
+                this.currentGame = null;
+                this.init();
+            }
+
+            init() {
+                console.log('🎮 Initializing Memory Master...');
+                this.setupEventListeners();
+                this.showWelcomeModal();
+                
+                // Loading screen ni 2 soniyadan so'ng yopish
+                setTimeout(() => {
+                    document.getElementById('loading').style.display = 'none';
+                }, 2000);
+            }
+
+            setupEventListeners() {
+                console.log('🔗 Setting up event listeners...');
+                
+                // Welcome modal
+                document.getElementById('start-game-btn').addEventListener('click', () => {
+                    this.startGame();
+                });
+
+                // Main app buttons
+                document.getElementById('start-btn').addEventListener('click', () => {
+                    this.showSection('game-modes');
+                });
+
+                document.getElementById('back-to-welcome').addEventListener('click', () => {
+                    this.showSection('welcome-section');
+                });
+
+                document.getElementById('game-back-btn').addEventListener('click', () => {
+                    this.showSection('game-modes');
+                });
+
+                // Game mode cards
+                document.querySelectorAll('.mode-card').forEach(card => {
+                    card.addEventListener('click', (e) => {
+                        const mode = e.currentTarget.dataset.mode;
+                        this.startGameMode(mode);
+                    });
+                });
+
+                // Profile button
+                document.getElementById('profile-btn').addEventListener('click', () => {
+                    this.showProfile();
+                });
+
+                document.querySelector('.close-modal').addEventListener('click', () => {
+                    this.hideProfile();
+                });
+
+                // Results buttons
+                document.getElementById('play-again-btn').addEventListener('click', () => {
+                    this.showSection('game-modes');
+                });
+
+                document.getElementById('back-to-modes-btn').addEventListener('click', () => {
+                    this.showSection('game-modes');
+                });
+            }
+
+            showWelcomeModal() {
+                console.log('👋 Showing welcome modal');
+                document.getElementById('welcome-modal').style.display = 'flex';
+            }
+
+            startGame() {
+                const nameInput = document.getElementById('user-name-input').value.trim();
+                
+                if (!nameInput) {
+                    alert('Iltimos, ismingizni kiriting!');
+                    return;
+                }
+
+                this.userName = nameInput;
+                console.log('👤 User name:', this.userName);
+                
+                // Welcome modalni yopish
+                document.getElementById('welcome-modal').style.display = 'none';
+                
+                // Asosiy app ni ko'rsatish
+                document.querySelector('.main-container').style.display = 'block';
+                
+                // Foydalanuvchi nomini yangilash
+                document.getElementById('welcome-name').textContent = this.userName;
+                document.getElementById('profile-user-name').textContent = this.userName;
+                
+                // Welcome sectionni ko'rsatish
+                this.showSection('welcome-section');
+            }
+
+            showSection(sectionId) {
+                console.log('📱 Showing section:', sectionId);
+                
+                // Barcha sectionlarni yashirish
+                document.querySelectorAll('section').forEach(section => {
+                    section.style.display = 'none';
+                });
+                
+                // Tanlangan sectionni ko'rsatish
+                const targetSection = document.getElementById(sectionId);
+                if (targetSection) {
+                    targetSection.style.display = 'block';
+                    targetSection.classList.add('active');
+                }
+            }
+
+            startGameMode(mode) {
+                console.log('🚀 Starting game mode:', mode);
+                this.showSection('game-area');
+                
+                const gameContent = document.getElementById('game-content');
+                
+                switch(mode) {
+                    case 'numbers':
+                        this.showNumbersGame(gameContent);
+                        break;
+                    case 'words':
+                        this.showWordsGame(gameContent);
+                        break;
+                    case 'flashcards':
+                        this.showFlashcardsGame(gameContent);
+                        break;
+                    default:
+                        this.showComingSoon(gameContent);
+                }
+            }
+
+            showNumbersGame(container) {
+                console.log('🔢 Showing numbers game');
+                
+                container.innerHTML = `
+                    <div style="text-align: center;">
+                        <h3>🔢 Raqamlar O'yini</h3>
+                        <p>3 ta raqamni eslab qoling va takrorlang</p>
+                        
+                        <div class="numbers-grid" id="numbers-display">
+                            <div class="number-card">7</div>
+                            <div class="number-card">2</div>
+                            <div class="number-card">9</div>
+                        </div>
+                        
+                        <p id="countdown">Raqamlar 3 soniyadan so'ng yopiladi...</p>
+                        
+                        <button class="cta-button" onclick="memoryMaster.startNumbersInput()" id="ready-btn" style="display: none;">
+                            Tayyorman
+                        </button>
+                    </div>
+                `;
+
+                // Raqamlarni 3 soniyadan so'ng yashirish
+                setTimeout(() => {
+                    document.querySelectorAll('.number-card').forEach(card => {
+                        card.style.visibility = 'hidden';
+                        card.textContent = '?';
+                    });
+                    document.getElementById('countdown').textContent = 'Endi raqamlarni ketma-ketlikda kiriting!';
+                    document.getElementById('ready-btn').style.display = 'block';
+                }, 3000);
+            }
+
+            startNumbersInput() {
+                const gameContent = document.getElementById('game-content');
+                gameContent.innerHTML = `
+                    <div style="text-align: center;">
+                        <h3>Raqamlarni ketma-ketlikda kiriting</h3>
+                        
+                        <div style="display: flex; gap: 0.5rem; justify-content: center; margin: 2rem 0;">
+                            <div class="number-card">?</div>
+                            <div class="number-card">?</div>
+                            <div class="number-card">?</div>
+                        </div>
+                        
+                        <div class="number-pad">
+                            <button class="number-btn" onclick="memoryMaster.addNumber(7)">7</button>
+                            <button class="number-btn" onclick="memoryMaster.addNumber(2)">2</button>
+                            <button class="number-btn" onclick="memoryMaster.addNumber(9)">9</button>
+                            <button class="number-btn" onclick="memoryMaster.addNumber(1)">1</button>
+                            <button class="number-btn" onclick="memoryMaster.addNumber(3)">3</button>
+                            <button class="number-btn" onclick="memoryMaster.addNumber(4)">4</button>
+                            <button class="number-btn" onclick="memoryMaster.addNumber(5)">5</button>
+                            <button class="number-btn" onclick="memoryMaster.addNumber(6)">6</button>
+                            <button class="number-btn" onclick="memoryMaster.addNumber(8)">8</button>
+                        </div>
+                        
+                        <div style="margin-top: 2rem;">
+                            <button class="back-button" onclick="memoryMaster.clearNumbers()">Tozalash</button>
+                            <button class="cta-button" onclick="memoryMaster.checkNumbersAnswer()">Tasdiqlash</button>
+                        </div>
+                    </div>
+                `;
+
+                this.userInput = [];
+                this.correctSequence = [7, 2, 9];
+            }
+
+            addNumber(number) {
+                if (this.userInput.length < 3) {
+                    this.userInput.push(number);
+                    this.updateNumberDisplay();
+                }
+            }
+
+            updateNumberDisplay() {
+                const cards = document.querySelectorAll('.number-card');
+                cards.forEach((card, index) => {
+                    if (this.userInput[index]) {
+                        card.textContent = this.userInput[index];
+                        card.style.background = 'rgba(255,255,255,0.3)';
+                    }
+                });
+            }
+
+            clearNumbers() {
+                this.userInput = [];
+                this.updateNumberDisplay();
+            }
+
+            checkNumbersAnswer() {
+                let correct = true;
+                for (let i = 0; i < 3; i++) {
+                    if (this.userInput[i] !== this.correctSequence[i]) {
+                        correct = false;
+                        break;
+                    }
+                }
+
+                if (correct) {
+                    this.showResults(100, 1, 'Ajoyib! Toʻgʻri javob! 🎉');
+                } else {
+                    this.showResults(0, 1, 'Notoʻgʻri! Toʻgʻri javob: 7, 2, 9');
+                }
+            }
+
+            showWordsGame(container) {
+                container.innerHTML = `
+                    <div style="text-align: center;">
+                        <h3>📝 So'zlar O'yini</h3>
+                        <p>Tez orada ishga tushadi! 🚀</p>
+                        <button class="back-button" onclick="memoryMaster.showSection('game-modes')">
+                            Orqaga
+                        </button>
+                    </div>
+                `;
+            }
+
+            showFlashcardsGame(container) {
+                container.innerHTML = `
+                    <div style="text-align: center;">
+                        <h3>🎴 Flash Kartalar</h3>
+                        <p>Tez orada ishga tushadi! 🌍</p>
+                        <button class="back-button" onclick="memoryMaster.showSection('game-modes')">
+                            Orqaga
+                        </button>
+                    </div>
+                `;
+            }
+
+            showComingSoon(container) {
+                container.innerHTML = `
+                    <div style="text-align: center;">
+                        <h3>🚧 Tez Kunda</h3>
+                        <p>Ushbu o'yin hozircha ishlab chiqilmoqda</p>
+                        <button class="back-button" onclick="memoryMaster.showSection('game-modes')">
+                            Orqaga
+                        </button>
+                    </div>
+                `;
+            }
+
+            showResults(score, steps, message) {
+                this.showSection('results-section');
+                document.getElementById('current-score').textContent = score;
+                document.getElementById('current-step').textContent = steps;
+                document.getElementById('result-message').textContent = message;
+            }
+
+            showProfile() {
+                document.getElementById('profile-modal').classList.add('active');
+            }
+
+            hideProfile() {
+                document.getElementById('profile-modal').classList.remove('active');
+            }
+        }
+
+        // App ni ishga tushirish
+        console.log('🚀 Starting Memory Master app...');
+        const memoryMaster = new MemoryMaster();
+        console.log('✅ Memory Master app started successfully!');
+    </script>
+</body>
+</html>
