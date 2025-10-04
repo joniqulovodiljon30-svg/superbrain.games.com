@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Master - Aqlingizni Sinab Ko'ring</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading" class="loading-screen">
+        <div class="loading-content">
+            <div class="brain-loader">
+                <i class="fas fa-brain"></i>
+            </div>
+            <h2>Memory Master</h2>
+            <p>Xotirangizni kuchaytiramiz...</p>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Background Animation -->
+        <div class="bg-animation">
+            <div class="floating-shapes">
+                <div class="shape shape-1"></div>
+                <div class="shape shape-2"></div>
+                <div class="shape shape-3"></div>
+                <div class="shape shape-4"></div>
+            </div>
+        </div>
+
+        <!-- Header -->
+        <header class="main-header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-brain"></i>
+                    <h1>Memory Master</h1>
+                </div>
+                <div class="user-section">
+                    <button id="profile-btn" class="profile-btn">
+                        <i class="fas fa-user"></i>
+                        <span>Profil</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Welcome Section -->
+            <section id="welcome-section" class="welcome-section active">
+                <div class="welcome-content">
+                    <div class="welcome-text">
+                        <h2>Xush kelibsiz, <span class="highlight">Memory Master</span>!</h2>
+                        <p>Aqlingizning chegaralarini sinab ko'ring va xotirangizni kuchaytiring. Turli o'yinlar orqali miyangizni mashq qiling.</p>
+                        <div class="stats-preview">
+                            <div class="stat-item">
+                                <i class="fas fa-gamepad"></i>
+                                <span>5+ O'yin turi</span>
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-chart-line"></i>
+                                <span>Darajali tizim</span>
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-trophy"></i>
+                                <span>Yutuqlar</span>
+                            </div>
+                        </div>
+                        <button id="start-btn" class="cta-button">
+                            Boshlash
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                    <div class="welcome-visual">
+                        <div class="floating-cards">
+                            <div class="card card-1"><i class="fas fa-1"></i></div>
+                            <div class="card card-2"><i class="fas fa-2"></i></div>
+                            <div class="card card-3"><i class="fas fa-3"></i></div>
+                            <div class="card card-4"><i class="fas fa-a"></i></div>
+                            <div class="card card-5"><i class="fas fa-b"></i></div>
+                            <div class="card card-6"><i class="fas fa-c"></i></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Game Modes Section -->
+            <section id="game-modes" class="game-modes-section">
+                <div class="section-header">
+                    <h2>O'yin Rejimlari</h2>
+                    <p>Quyidagi o'yinlardan birini tanlang va boshlang</p>
+                </div>
+                
+                <div class="modes-grid">
+                    <!-- Numbers Game -->
+                    <div class="mode-card" data-mode="numbers">
+                        <div class="mode-icon">
+                            <i class="fas fa-sort-numeric-up"></i>
+                        </div>
+                        <div class="mode-content">
+                            <h3>Raqamlar</h3>
+                            <p>Raqamlar ketma-ketligini eslab qoling va takrorlang</p>
+                            <div class="mode-stats">
+                                <span><i class="fas fa-fire"></i> Daraja: 5</span>
+                                <span><i class="fas fa-clock"></i> 2-5 daqiqa</span>
+                            </div>
+                        </div>
+                        <div class="mode-badge">Mashq</div>
+                    </div>
+
+                    <!-- Words Game -->
+                    <div class="mode-card" data-mode="words">
+                        <div class="mode-icon">
+                            <i class="fas fa-font"></i>
+                        </div>
+                        <div class="mode-content">
+                            <h3>So'zlar</h3>
+                            <p>So'zlar ketma-ketligini eslab qoling va takrorlang</p>
+                            <div class="mode-stats">
+                                <span><i class="fas fa-fire"></i> Daraja: 5</span>
+                                <span><i class="fas fa-clock"></i> 3-6 daqiqa</span>
+                            </div>
+                        </div>
+                        <div class="mode-badge">Mashq</div>
+                    </div>
+
+                    <!-- Flashcards -->
+                    <div class="mode-card" data-mode="flashcards">
+                        <div class="mode-icon">
+                            <i class="fas fa-layer-group"></i>
+                        </div>
+                        <div class="mode-content">
+                            <h3>Flash Kartalar</h3>
+                            <p>6 xil tilda so'zlarni o'rganing va yodlang</p>
+                            <div class="mode-stats">
+                                <span><i class="fas fa-fire"></i> 1500+ so'z</span>
+                                <span><i class="fas fa-clock"></i> Cheksiz</span>
+                            </div>
+                        </div>
+                        <div class="mode-badge premium">
+                            <i class="fas fa-crown"></i>
+                            Premium
+                        </div>
+                    </div>
+
+                    <!-- Faces Game -->
+                    <div class="mode-card" data-mode="faces">
+                        <div class="mode-icon">
+                            <i class="fas fa-user-friends"></i>
+                        </div>
+                        <div class="mode-content">
+                            <h3>Yuzlar</h3>
+                            <p>Yuzlarni eslab qoling va ularni tanib oling</p>
+                            <div class="mode-stats">
+                                <span><i class="fas fa-fire"></i> Daraja: 3</span>
+                                <span><i class="fas fa-clock"></i> 4 daqiqa</span>
+                            </div>
+                        </div>
+                        <div class="mode-badge">Yangi</div>
+                    </div>
+
+                    <!-- Images Game -->
+                    <div class="mode-card" data-mode="images">
+                        <div class="mode-icon">
+                            <i class="fas fa-images"></i>
+                        </div>
+                        <div class="mode-content">
+                            <h3>Rasmlar</h3>
+                            <p>Rasmlar ketma-ketligini eslab qoling va takrorlang</p>
+                            <div class="mode-stats">
+                                <span><i class="fas fa-fire"></i> Daraja: 4</span>
+                                <span><i class="fas fa-clock"></i> 3-5 daqiqa</span>
+                            </div>
+                        </div>
+                        <div class="mode-badge">Yangi</div>
+                    </div>
+                </div>
+
+                <div class="section-footer">
+                    <button id="back-to-welcome" class="back-button">
+                        <i class="fas fa-arrow-left"></i>
+                        Orqaga
+                    </button>
+                </div>
+            </section>
+
+            <!-- Game Area -->
+            <section id="game-area" class="game-area-section">
+                <div class="game-header">
+                    <button id="game-back-btn" class="back-button">
+                        <i class="fas fa-arrow-left"></i>
+                        Menyuga qaytish
+                    </button>
+                    <div class="game-info">
+                        <div class="info-item">
+                            <i class="fas fa-trophy"></i>
+                            <span>Ball: <strong id="current-score">0</strong></span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-footsteps"></i>
+                            <span>Qadam: <strong id="current-step">0</strong></span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-clock"></i>
+                            <span>Vaqt: <strong id="game-timer">00:00</strong></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="game-content" class="game-content">
+                    <!-- Game content will be loaded here dynamically -->
+                </div>
+            </section>
+
+            <!-- Results Section -->
+            <section id="results-section" class="results-section">
+                <div class="results-container">
+                    <div class="results-header">
+                        <div class="result-icon">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <h2>O'yin Yakunlandi!</h2>
+                    </div>
+                    
+                    <div class="results-stats">
+                        <div class="stat-card">
+                            <div class="stat-value" id="final-score">0</div>
+                            <div class="stat-label">Yakuniy Ball</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="final-steps">0</div>
+                            <div class="stat-label">Qadamlar</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="final-time">00:00</div>
+                            <div class="stat-label">Sarflangan Vaqt</div>
+                        </div>
+                    </div>
+
+                    <div class="results-message">
+                        <p id="result-message-text">Ajoyib natija! Siz a'lo darajada o'ynadingiz.</p>
+                    </div>
+
+                    <div class="results-actions">
+                        <button id="play-again-btn" class="action-button primary">
+                            <i class="fas fa-redo"></i>
+                            Yana O'ynash
+                        </button>
+                        <button id="back-to-modes-btn" class="action-button secondary">
+                            <i class="fas fa-th-large"></i>
+                            Boshqa O'yin
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Profile Modal -->
+        <div id="profile-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Foydalanuvchi Profili</h3>
+                    <button class="close-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="profile-info">
+                        <div class="avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="user-details">
+                            <h4 id="user-name">Mehmon Foydalanuvchi</h4>
+                            <p>Memory Master</p>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-stats">
+                        <h4>Statistika</h4>
+                        <div class="stats-grid">
+                            <div class="stat">
+                                <div class="stat-number">0</div>
+                                <div class="stat-label">O'ynalgan o'yinlar</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-number">0</div>
+                                <div class="stat-label">Yutuqlar</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-number">0</div>
+                                <div class="stat-label">Eng yuqori ball</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Files -->
+    <script src="data.js"></script>
+    <script src="utils/storage.js"></script>
+    <script src="utils/helpers.js"></script>
+    <script src="modules/numbers.js"></script>
+    <script src="modules/words.js"></script>
+    <script src="modules/flashcards.js"></script>
+    <script src="modules/faces.js"></script>
+    <script src="modules/images.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
+<script src="profiles/user.js"></script>
+<script src="profiles/stats.js"></script>
+<script src="app.js"></script>
