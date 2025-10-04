@@ -665,7 +665,7 @@ window.addEventListener('error', function(e) {
 window.App = MemoryMaster;
 
     // ==================== FLASHCARDS O'YINI ====================
-    startFlashcardsGame() {
+    startFlashcardsGame()
         this.createGameSection('flashcards', 'Flashcards', `
             <div class="settings-screen" id="flashcards-language">
                 <h3>Tilni tanlang</h3>
@@ -1471,3 +1471,4 @@ window.addEventListener('error', function(e) {
 });
 
 window.App = MemoryMaster;
+
