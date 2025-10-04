@@ -270,4 +270,52 @@ window.UserManager = UserManager;
 window.StatsManager = StatsManager;
 
 // O'yin natijalarini saqlashda user manager ni chaqirish
+
 // Storage.js da updateStats funksiyasini yangilash kerak
+// app.js ning OXIRIGA qo'shing
+console.log('🎮 Memory Master app.js loaded successfully');
+
+// Loading screen ni avtomatik yopish
+setTimeout(() => {
+    const loadingScreen = document.getElementById('loading');
+    if (loadingScreen && !window.gameApp) {
+        console.log('⚠️ GameApp not initialized - auto-hiding loading screen');
+        loadingScreen.classList.add('fade-out');
+        setTimeout(() => {
+            loadingScreen.style.display = 'none';
+        }, 500);
+    }
+}, 3000);
+
+// Global function for testing
+window.testGameApp = function() {
+    console.log('🧪 Testing GameApp...');
+    
+    if (typeof GameApp !== 'undefined') {
+        console.log('✅ GameApp class found');
+        try {
+            window.gameApp = new GameApp();
+            console.log('✅ GameApp initialized successfully');
+            return true;
+        } catch (error) {
+            console.error('❌ GameApp initialization failed:', error);
+            return false;
+        }
+    } else {
+        console.error('❌ GameApp class not found');
+        return false;
+    }
+};
+
+// Auto-test on load
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🏠 DOM Content Loaded');
+    
+    // 2 soniyadan so'ng test qilish
+    setTimeout(() => {
+        if (!window.gameApp) {
+            console.log('🔄 Auto-testing GameApp...');
+            window.testGameApp();
+        }
+    }, 2000);
+});
