@@ -3,306 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Memory Master</title>
+    <title>Memory Master - Aqlingizni Sinab Ko'ring</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            min-height: 100vh;
-        }
-
-        /* LOADING */
-        .loading-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #0f172a;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-        }
-
-        .loading-content {
-            text-align: center;
-        }
-
-        .brain-loader {
-            font-size: 4rem;
-            color: #6366f1;
-            margin-bottom: 1rem;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-
-        /* WELCOME MODAL */
-        #welcome-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-
-        .welcome-modal {
-            background: #1e293b;
-            border-radius: 16px;
-            padding: 2rem;
-            max-width: 500px;
-            width: 90%;
-            text-align: center;
-        }
-
-        .welcome-icon {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-            color: #6366f1;
-        }
-
-        .input-group {
-            margin: 2rem 0;
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 1rem;
-            border: 2px solid rgba(255,255,255,0.2);
-            border-radius: 8px;
-            background: rgba(255,255,255,0.1);
-            color: white;
-            font-size: 1rem;
-        }
-
-        .welcome-btn {
-            width: 100%;
-            padding: 1rem 2rem;
-            background: #6366f1;
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 1.1rem;
-            cursor: pointer;
-        }
-
-        /* MAIN APP */
-        .main-container {
-            display: none;
-            min-height: 100vh;
-        }
-
-        .main-header {
-            background: rgba(30,41,59,0.8);
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-
-        .profile-btn {
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        .main-content {
-            padding: 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        /* SECTIONS */
-        section {
-            display: none;
-        }
-
-        section.active {
-            display: block;
-        }
-
-        /* WELCOME SECTION */
-        .welcome-section {
-            text-align: center;
-            padding: 4rem 2rem;
-        }
-
-        .welcome-section h2 {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-        }
-
-        .cta-button {
-            background: #6366f1;
-            color: white;
-            border: none;
-            padding: 1rem 2rem;
-            border-radius: 12px;
-            font-size: 1.1rem;
-            cursor: pointer;
-            margin-top: 2rem;
-        }
-
-        /* GAME MODES */
-        .modes-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-            margin: 2rem 0;
-        }
-
-        .mode-card {
-            background: rgba(255,255,255,0.1);
-            padding: 2rem;
-            border-radius: 16px;
-            cursor: pointer;
-            border: 2px solid rgba(255,255,255,0.2);
-        }
-
-        .mode-card:hover {
-            background: rgba(255,255,255,0.2);
-        }
-
-        /* GAME AREA */
-        .game-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            padding: 1rem;
-            background: rgba(255,255,255,0.1);
-            border-radius: 12px;
-        }
-
-        .back-button {
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        .game-content {
-            background: rgba(255,255,255,0.1);
-            padding: 2rem;
-            border-radius: 16px;
-            min-height: 400px;
-        }
-
-        /* NUMBERS GAME */
-        .numbers-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-            gap: 1rem;
-            margin: 2rem 0;
-        }
-
-        .number-card {
-            background: rgba(255,255,255,0.2);
-            padding: 2rem 1rem;
-            border-radius: 12px;
-            text-align: center;
-            font-size: 1.5rem;
-        }
-
-        .number-pad {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 0.5rem;
-            max-width: 200px;
-            margin: 2rem auto;
-        }
-
-        .number-btn {
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.3);
-            color: white;
-            padding: 1rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1.2rem;
-        }
-
-        /* RESULTS - BOSHLANISHDA YASHIRIN */
-        .results-section {
-            display: none;
-            text-align: center;
-            padding: 4rem 2rem;
-        }
-
-        /* PROFILE MODAL */
-        #profile-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-
-        #profile-modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: #1e293b;
-            border-radius: 16px;
-            padding: 2rem;
-            max-width: 500px;
-            width: 90%;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-
-        .close-modal {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1.5rem;
-            cursor: pointer;
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- 1. LOADING SCREEN -->
+    <!-- Loading Screen -->
     <div id="loading" class="loading-screen">
         <div class="loading-content">
             <div class="brain-loader">
@@ -313,425 +20,296 @@
         </div>
     </div>
 
-    <!-- 2. WELCOME MODAL - BIRINCHI KO'RINADI -->
-    <div id="welcome-modal">
-        <div class="welcome-modal">
-            <div class="welcome-icon">
-                <i class="fas fa-brain"></i>
-            </div>
-            <h2>Memory Master ga Xush Kelibsiz!</h2>
-            <p>O'yinga kirish uchun ismingizni kiriting</p>
-            
-            <div class="input-group">
-                <input type="text" id="user-name-input" placeholder="Ismingizni kiriting..." maxlength="20">
-            </div>
-            
-            <button id="start-game-btn" class="welcome-btn">
-                <i class="fas fa-play"></i>
-                O'yinni Boshlash
-            </button>
-        </div>
-    </div>
-
-    <!-- 3. ASOSIY APP - AVVAL YASHIRIN -->
+    <!-- Main Container -->
     <div class="main-container">
+        <!-- Background Animation -->
+        <div class="bg-animation">
+            <div class="floating-shapes">
+                <div class="shape shape-1"></div>
+                <div class="shape shape-2"></div>
+                <div class="shape shape-3"></div>
+                <div class="shape shape-4"></div>
+            </div>
+        </div>
+
         <!-- Header -->
         <header class="main-header">
-            <div class="logo">
-                <i class="fas fa-brain"></i>
-                <span>Memory Master</span>
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-brain"></i>
+                    <h1>Memory Master</h1>
+                </div>
+                <div class="user-section">
+                    <button id="profile-btn" class="profile-btn">
+                        <i class="fas fa-user"></i>
+                        <span>Profil</span>
+                    </button>
+                </div>
             </div>
-            <button id="profile-btn" class="profile-btn">
-                <i class="fas fa-user"></i>
-                Profil
-            </button>
         </header>
 
         <!-- Main Content -->
         <main class="main-content">
             <!-- Welcome Section -->
-            <section id="welcome-section" class="active">
-                <div class="welcome-section">
-                    <h2>Xush kelibsiz, <span id="welcome-name">Foydalanuvchi</span>!</h2>
-                    <p>Aqlingizni sinab ko'ring va xotirangizni kuchaytiring</p>
-                    <button id="start-btn" class="cta-button">
-                        Boshlash <i class="fas fa-arrow-right"></i>
-                    </button>
+            <section id="welcome-section" class="welcome-section active">
+                <div class="welcome-content">
+                    <div class="welcome-text">
+                        <h2>Xush kelibsiz, <span class="highlight">Memory Master</span>!</h2>
+                        <p>Aqlingizning chegaralarini sinab ko'ring va xotirangizni kuchaytiring. Turli o'yinlar orqali miyangizni mashq qiling.</p>
+                        <div class="stats-preview">
+                            <div class="stat-item">
+                                <i class="fas fa-gamepad"></i>
+                                <span>5+ O'yin turi</span>
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-chart-line"></i>
+                                <span>Darajali tizim</span>
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-trophy"></i>
+                                <span>Yutuqlar</span>
+                            </div>
+                        </div>
+                        <button id="start-btn" class="cta-button">
+                            Boshlash
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                    <div class="welcome-visual">
+                        <div class="floating-cards">
+                            <div class="card card-1"><i class="fas fa-1"></i></div>
+                            <div class="card card-2"><i class="fas fa-2"></i></div>
+                            <div class="card card-3"><i class="fas fa-3"></i></div>
+                            <div class="card card-4"><i class="fas fa-a"></i></div>
+                            <div class="card card-5"><i class="fas fa-b"></i></div>
+                            <div class="card card-6"><i class="fas fa-c"></i></div>
+                        </div>
+                    </div>
                 </div>
             </section>
 
             <!-- Game Modes Section -->
-            <section id="game-modes">
-                <h2>O'yin Rejimlari</h2>
-                <p>Quyidagi o'yinlardan birini tanlang</p>
+            <section id="game-modes" class="game-modes-section">
+                <div class="section-header">
+                    <h2>O'yin Rejimlari</h2>
+                    <p>Quyidagi o'yinlardan birini tanlang va boshlang</p>
+                </div>
                 
                 <div class="modes-grid">
+                    <!-- Numbers Game -->
                     <div class="mode-card" data-mode="numbers">
-                        <h3>🔢 Raqamlar</h3>
-                        <p>Raqamlar ketma-ketligini eslab qoling</p>
+                        <div class="mode-icon">
+                            <i class="fas fa-sort-numeric-up"></i>
+                        </div>
+                        <div class="mode-content">
+                            <h3>Raqamlar</h3>
+                            <p>Raqamlar ketma-ketligini eslab qoling va takrorlang</p>
+                            <div class="mode-stats">
+                                <span><i class="fas fa-fire"></i> Daraja: 5</span>
+                                <span><i class="fas fa-clock"></i> 2-5 daqiqa</span>
+                            </div>
+                        </div>
+                        <div class="mode-badge">Mashq</div>
                     </div>
-                    
+
+                    <!-- Words Game -->
                     <div class="mode-card" data-mode="words">
-                        <h3>📝 So'zlar</h3>
-                        <p>So'zlar ketma-ketligini eslab qoling</p>
+                        <div class="mode-icon">
+                            <i class="fas fa-font"></i>
+                        </div>
+                        <div class="mode-content">
+                            <h3>So'zlar</h3>
+                            <p>So'zlar ketma-ketligini eslab qoling va takrorlang</p>
+                            <div class="mode-stats">
+                                <span><i class="fas fa-fire"></i> Daraja: 5</span>
+                                <span><i class="fas fa-clock"></i> 3-6 daqiqa</span>
+                            </div>
+                        </div>
+                        <div class="mode-badge">Mashq</div>
                     </div>
-                    
+
+                    <!-- Flashcards -->
                     <div class="mode-card" data-mode="flashcards">
-                        <h3>🎴 Flash Kartalar</h3>
-                        <p>6 xil tilda so'zlarni o'rganing</p>
+                        <div class="mode-icon">
+                            <i class="fas fa-layer-group"></i>
+                        </div>
+                        <div class="mode-content">
+                            <h3>Flash Kartalar</h3>
+                            <p>6 xil tilda so'zlarni o'rganing va yodlang</p>
+                            <div class="mode-stats">
+                                <span><i class="fas fa-fire"></i> 1500+ so'z</span>
+                                <span><i class="fas fa-clock"></i> Cheksiz</span>
+                            </div>
+                        </div>
+                        <div class="mode-badge premium">
+                            <i class="fas fa-crown"></i>
+                            Premium
+                        </div>
+                    </div>
+
+                    <!-- Faces Game -->
+                    <div class="mode-card" data-mode="faces">
+                        <div class="mode-icon">
+                            <i class="fas fa-user-friends"></i>
+                        </div>
+                        <div class="mode-content">
+                            <h3>Yuzlar</h3>
+                            <p>Yuzlarni eslab qoling va ularni tanib oling</p>
+                            <div class="mode-stats">
+                                <span><i class="fas fa-fire"></i> Daraja: 3</span>
+                                <span><i class="fas fa-clock"></i> 4 daqiqa</span>
+                            </div>
+                        </div>
+                        <div class="mode-badge">Yangi</div>
+                    </div>
+
+                    <!-- Images Game -->
+                    <div class="mode-card" data-mode="images">
+                        <div class="mode-icon">
+                            <i class="fas fa-images"></i>
+                        </div>
+                        <div class="mode-content">
+                            <h3>Rasmlar</h3>
+                            <p>Rasmlar ketma-ketligini eslab qoling va takrorlang</p>
+                            <div class="mode-stats">
+                                <span><i class="fas fa-fire"></i> Daraja: 4</span>
+                                <span><i class="fas fa-clock"></i> 3-5 daqiqa</span>
+                            </div>
+                        </div>
+                        <div class="mode-badge">Yangi</div>
                     </div>
                 </div>
 
-                <button id="back-to-welcome" class="back-button">
-                    <i class="fas fa-arrow-left"></i> Orqaga
-                </button>
+                <div class="section-footer">
+                    <button id="back-to-welcome" class="back-button">
+                        <i class="fas fa-arrow-left"></i>
+                        Orqaga
+                    </button>
+                </div>
             </section>
 
             <!-- Game Area -->
-            <section id="game-area">
+            <section id="game-area" class="game-area-section">
                 <div class="game-header">
                     <button id="game-back-btn" class="back-button">
-                        <i class="fas fa-arrow-left"></i> Menyuga qaytish
+                        <i class="fas fa-arrow-left"></i>
+                        Menyuga qaytish
                     </button>
                     <div class="game-info">
-                        <span>Ball: <strong id="current-score">0</strong></span>
-                        <span>Qadam: <strong id="current-step">0</strong></span>
-                        <span>Vaqt: <strong id="game-timer">00:00</strong></span>
+                        <div class="info-item">
+                            <i class="fas fa-trophy"></i>
+                            <span>Ball: <strong id="current-score">0</strong></span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-footsteps"></i>
+                            <span>Qadam: <strong id="current-step">0</strong></span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-clock"></i>
+                            <span>Vaqt: <strong id="game-timer">00:00</strong></span>
+                        </div>
                     </div>
                 </div>
 
                 <div id="game-content" class="game-content">
-                    <!-- O'yin kontenti shu yerga yuklanadi -->
-                    <div style="text-align: center; padding: 4rem 2rem;">
-                        <h3>O'yinni tanlang</h3>
-                        <p>Yuqoridagi menyudan o'yin tanlang</p>
-                    </div>
+                    <!-- Game content will be loaded here dynamically -->
                 </div>
             </section>
 
-            <!-- Results Section - FAQAT O'YINDAN KEYIN KO'RINADI -->
+            <!-- Results Section -->
             <section id="results-section" class="results-section">
-                <h2>O'yin Yakunlandi!</h2>
-                <p id="result-message">Ajoyib natija!</p>
-                <button id="play-again-btn" class="cta-button">Yana O'ynash</button>
-                <button id="back-to-modes-btn" class="back-button">Boshqa O'yin</button>
+                <div class="results-container">
+                    <div class="results-header">
+                        <div class="result-icon">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <h2>O'yin Yakunlandi!</h2>
+                    </div>
+                    
+                    <div class="results-stats">
+                        <div class="stat-card">
+                            <div class="stat-value" id="final-score">0</div>
+                            <div class="stat-label">Yakuniy Ball</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="final-steps">0</div>
+                            <div class="stat-label">Qadamlar</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="final-time">00:00</div>
+                            <div class="stat-label">Sarflangan Vaqt</div>
+                        </div>
+                    </div>
+
+                    <div class="results-message">
+                        <p id="result-message-text">Ajoyib natija! Siz a'lo darajada o'ynadingiz.</p>
+                    </div>
+
+                    <div class="results-actions">
+                        <button id="play-again-btn" class="action-button primary">
+                            <i class="fas fa-redo"></i>
+                            Yana O'ynash
+                        </button>
+                        <button id="back-to-modes-btn" class="action-button secondary">
+                            <i class="fas fa-th-large"></i>
+                            Boshqa O'yin
+                        </button>
+                    </div>
+                </div>
             </section>
         </main>
-    </div>
 
-    <!-- Profile Modal -->
-    <div id="profile-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Foydalanuvchi Profili</h3>
-                <button class="close-modal">&times;</button>
-            </div>
-            <div class="profile-info">
-                <h4 id="profile-user-name">Foydalanuvchi</h4>
-                <p>Memory Master</p>
+        <!-- Profile Modal -->
+        <div id="profile-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Foydalanuvchi Profili</h3>
+                    <button class="close-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="profile-info">
+                        <div class="avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="user-details">
+                            <h4 id="user-name">Mehmon Foydalanuvchi</h4>
+                            <p>Memory Master</p>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-stats">
+                        <h4>Statistika</h4>
+                        <div class="stats-grid">
+                            <div class="stat">
+                                <div class="stat-number">0</div>
+                                <div class="stat-label">O'ynalgan o'yinlar</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-number">0</div>
+                                <div class="stat-label">Yutuqlar</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-number">0</div>
+                                <div class="stat-label">Eng yuqori ball</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <script>
-        // APP LOGIC
-        console.log('🧠 Memory Master - App Starting...');
-
-        class MemoryMaster {
-            constructor() {
-                this.userName = '';
-                this.currentGame = null;
-                this.init();
-            }
-
-            init() {
-                console.log('🎮 Initializing Memory Master...');
-                this.setupEventListeners();
-                this.showWelcomeModal();
-                
-                // Loading screen ni 2 soniyadan so'ng yopish
-                setTimeout(() => {
-                    document.getElementById('loading').style.display = 'none';
-                }, 2000);
-            }
-
-            setupEventListeners() {
-                console.log('🔗 Setting up event listeners...');
-                
-                // Welcome modal
-                document.getElementById('start-game-btn').addEventListener('click', () => {
-                    this.startGame();
-                });
-
-                // Main app buttons
-                document.getElementById('start-btn').addEventListener('click', () => {
-                    this.showSection('game-modes');
-                });
-
-                document.getElementById('back-to-welcome').addEventListener('click', () => {
-                    this.showSection('welcome-section');
-                });
-
-                document.getElementById('game-back-btn').addEventListener('click', () => {
-                    this.showSection('game-modes');
-                });
-
-                // Game mode cards
-                document.querySelectorAll('.mode-card').forEach(card => {
-                    card.addEventListener('click', (e) => {
-                        const mode = e.currentTarget.dataset.mode;
-                        this.startGameMode(mode);
-                    });
-                });
-
-                // Profile button
-                document.getElementById('profile-btn').addEventListener('click', () => {
-                    this.showProfile();
-                });
-
-                document.querySelector('.close-modal').addEventListener('click', () => {
-                    this.hideProfile();
-                });
-
-                // Results buttons
-                document.getElementById('play-again-btn').addEventListener('click', () => {
-                    this.showSection('game-modes');
-                });
-
-                document.getElementById('back-to-modes-btn').addEventListener('click', () => {
-                    this.showSection('game-modes');
-                });
-            }
-
-            showWelcomeModal() {
-                console.log('👋 Showing welcome modal');
-                document.getElementById('welcome-modal').style.display = 'flex';
-            }
-
-            startGame() {
-                const nameInput = document.getElementById('user-name-input').value.trim();
-                
-                if (!nameInput) {
-                    alert('Iltimos, ismingizni kiriting!');
-                    return;
-                }
-
-                this.userName = nameInput;
-                console.log('👤 User name:', this.userName);
-                
-                // Welcome modalni yopish
-                document.getElementById('welcome-modal').style.display = 'none';
-                
-                // Asosiy app ni ko'rsatish
-                document.querySelector('.main-container').style.display = 'block';
-                
-                // Foydalanuvchi nomini yangilash
-                document.getElementById('welcome-name').textContent = this.userName;
-                document.getElementById('profile-user-name').textContent = this.userName;
-                
-                // Welcome sectionni ko'rsatish
-                this.showSection('welcome-section');
-            }
-
-            showSection(sectionId) {
-                console.log('📱 Showing section:', sectionId);
-                
-                // Barcha sectionlarni yashirish
-                document.querySelectorAll('section').forEach(section => {
-                    section.style.display = 'none';
-                });
-                
-                // Tanlangan sectionni ko'rsatish
-                const targetSection = document.getElementById(sectionId);
-                if (targetSection) {
-                    targetSection.style.display = 'block';
-                    targetSection.classList.add('active');
-                }
-            }
-
-            startGameMode(mode) {
-                console.log('🚀 Starting game mode:', mode);
-                this.showSection('game-area');
-                
-                const gameContent = document.getElementById('game-content');
-                
-                switch(mode) {
-                    case 'numbers':
-                        this.showNumbersGame(gameContent);
-                        break;
-                    case 'words':
-                        this.showWordsGame(gameContent);
-                        break;
-                    case 'flashcards':
-                        this.showFlashcardsGame(gameContent);
-                        break;
-                    default:
-                        this.showComingSoon(gameContent);
-                }
-            }
-
-            showNumbersGame(container) {
-                console.log('🔢 Showing numbers game');
-                
-                container.innerHTML = `
-                    <div style="text-align: center;">
-                        <h3>🔢 Raqamlar O'yini</h3>
-                        <p>3 ta raqamni eslab qoling va takrorlang</p>
-                        
-                        <div class="numbers-grid" id="numbers-display">
-                            <div class="number-card">7</div>
-                            <div class="number-card">2</div>
-                            <div class="number-card">9</div>
-                        </div>
-                        
-                        <p id="countdown">Raqamlar 3 soniyadan so'ng yopiladi...</p>
-                        
-                        <button class="cta-button" onclick="memoryMaster.startNumbersInput()" id="ready-btn" style="display: none;">
-                            Tayyorman
-                        </button>
-                    </div>
-                `;
-
-                // Raqamlarni 3 soniyadan so'ng yashirish
-                setTimeout(() => {
-                    document.querySelectorAll('.number-card').forEach(card => {
-                        card.style.visibility = 'hidden';
-                        card.textContent = '?';
-                    });
-                    document.getElementById('countdown').textContent = 'Endi raqamlarni ketma-ketlikda kiriting!';
-                    document.getElementById('ready-btn').style.display = 'block';
-                }, 3000);
-            }
-
-            startNumbersInput() {
-                const gameContent = document.getElementById('game-content');
-                gameContent.innerHTML = `
-                    <div style="text-align: center;">
-                        <h3>Raqamlarni ketma-ketlikda kiriting</h3>
-                        
-                        <div style="display: flex; gap: 0.5rem; justify-content: center; margin: 2rem 0;">
-                            <div class="number-card">?</div>
-                            <div class="number-card">?</div>
-                            <div class="number-card">?</div>
-                        </div>
-                        
-                        <div class="number-pad">
-                            <button class="number-btn" onclick="memoryMaster.addNumber(7)">7</button>
-                            <button class="number-btn" onclick="memoryMaster.addNumber(2)">2</button>
-                            <button class="number-btn" onclick="memoryMaster.addNumber(9)">9</button>
-                            <button class="number-btn" onclick="memoryMaster.addNumber(1)">1</button>
-                            <button class="number-btn" onclick="memoryMaster.addNumber(3)">3</button>
-                            <button class="number-btn" onclick="memoryMaster.addNumber(4)">4</button>
-                            <button class="number-btn" onclick="memoryMaster.addNumber(5)">5</button>
-                            <button class="number-btn" onclick="memoryMaster.addNumber(6)">6</button>
-                            <button class="number-btn" onclick="memoryMaster.addNumber(8)">8</button>
-                        </div>
-                        
-                        <div style="margin-top: 2rem;">
-                            <button class="back-button" onclick="memoryMaster.clearNumbers()">Tozalash</button>
-                            <button class="cta-button" onclick="memoryMaster.checkNumbersAnswer()">Tasdiqlash</button>
-                        </div>
-                    </div>
-                `;
-
-                this.userInput = [];
-                this.correctSequence = [7, 2, 9];
-            }
-
-            addNumber(number) {
-                if (this.userInput.length < 3) {
-                    this.userInput.push(number);
-                    this.updateNumberDisplay();
-                }
-            }
-
-            updateNumberDisplay() {
-                const cards = document.querySelectorAll('.number-card');
-                cards.forEach((card, index) => {
-                    if (this.userInput[index]) {
-                        card.textContent = this.userInput[index];
-                        card.style.background = 'rgba(255,255,255,0.3)';
-                    }
-                });
-            }
-
-            clearNumbers() {
-                this.userInput = [];
-                this.updateNumberDisplay();
-            }
-
-            checkNumbersAnswer() {
-                let correct = true;
-                for (let i = 0; i < 3; i++) {
-                    if (this.userInput[i] !== this.correctSequence[i]) {
-                        correct = false;
-                        break;
-                    }
-                }
-
-                if (correct) {
-                    this.showResults(100, 1, 'Ajoyib! Toʻgʻri javob! 🎉');
-                } else {
-                    this.showResults(0, 1, 'Notoʻgʻri! Toʻgʻri javob: 7, 2, 9');
-                }
-            }
-
-            showWordsGame(container) {
-                container.innerHTML = `
-                    <div style="text-align: center;">
-                        <h3>📝 So'zlar O'yini</h3>
-                        <p>Tez orada ishga tushadi! 🚀</p>
-                        <button class="back-button" onclick="memoryMaster.showSection('game-modes')">
-                            Orqaga
-                        </button>
-                    </div>
-                `;
-            }
-
-            showFlashcardsGame(container) {
-                container.innerHTML = `
-                    <div style="text-align: center;">
-                        <h3>🎴 Flash Kartalar</h3>
-                        <p>Tez orada ishga tushadi! 🌍</p>
-                        <button class="back-button" onclick="memoryMaster.showSection('game-modes')">
-                            Orqaga
-                        </button>
-                    </div>
-                `;
-            }
-
-            showComingSoon(container) {
-                container.innerHTML = `
-                    <div style="text-align: center;">
-                        <h3>🚧 Tez Kunda</h3>
-                        <p>Ushbu o'yin hozircha ishlab chiqilmoqda</p>
-                        <button class="back-button" onclick="memoryMaster.showSection('game-modes')">
-                            Orqaga
-                        </button>
-                    </div>
-                `;
-            }
-
-            showResults(score, steps, message) {
-                this.showSection('results-section');
-                document.getElementById('current-score').textContent = score;
-                document.getElementById('current-step').textContent = steps;
-                document.getElementById('result-message').textContent = message;
-            }
-
-            showProfile() {
-                document.getElementById('profile-modal').classList.add('active');
-            }
-
-            hideProfile() {
-                document.getElementById('profile-modal').classList.remove('active');
-            }
-        }
-
-        // App ni ishga tushirish
-        console.log('🚀 Starting Memory Master app...');
-        const memoryMaster = new MemoryMaster();
-        console.log('✅ Memory Master app started successfully!');
-    </script>
+    <!-- Script Files -->
+    <script src="data.js"></script>
+    <script src="utils/storage.js"></script>
+    <script src="utils/helpers.js"></script>
+    <script src="modules/numbers.js"></script>
+    <script src="modules/words.js"></script>
+    <script src="modules/flashcards.js"></script>
+    <script src="modules/faces.js"></script>
+    <script src="modules/images.js"></script>
+    <script src="profiles/user.js"></script>
+    <script src="profiles/stats.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
