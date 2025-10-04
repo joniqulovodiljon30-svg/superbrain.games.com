@@ -350,4 +350,13 @@ class NumbersGame {
 }
 
 // Global instance yaratish
+
 const NumbersGameInstance = new NumbersGame();
+console.log('🔢 NumbersGame module loaded');
+
+// Global instance yaratish - BU MAUHIM!
+if (typeof NumbersGameInstance === 'undefined') {
+    console.log('🔄 Creating NumbersGameInstance...');
+    const NumbersGameInstance = new NumbersGame();
+    window.NumbersGameInstance = NumbersGameInstance;
+}
