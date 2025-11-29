@@ -4,8 +4,474 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Memory Master - Mnemonika O'yini</title>
+    <!-- Tailwind CSS yuklash (stil uchun) -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        :root {
+            --primary-color: #4f46e5; /* Indigo */
+            --secondary-color: #06b6d4; /* Cyan/Teal (Yangi zamonaviy rang) */
+            --background-color: #f3f4f6; /* Gray-100 */
+            --card-bg: #ffffff;
+            --success-color: #10b981;
+            --error-color: #ef4444;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background-color);
+            transition: all 0.3s;
+        }
+
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 100;
+            opacity: 1;
+            transition: opacity 0.5s ease;
+        }
+        .loading-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .brain-icon i {
+            font-size: 5rem;
+            margin-bottom: 1rem;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .loading-bar {
+            width: 80%;
+            max-width: 300px;
+            height: 8px;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            margin-top: 1rem;
+            overflow: hidden;
+        }
+        .loading-progress {
+            width: 0;
+            height: 100%;
+            background-color: white;
+            transition: width 0.5s ease;
+        }
+
+        /* App Container & Sections */
+        .app-container {
+            max-width: 100%;
+            margin: 0 auto;
+            min-height: 100vh;
+            background-color: var(--background-color);
+            padding: 1rem 0;
+        }
+        .section {
+            display: none;
+            padding: 1rem;
+            min-height: calc(100vh - 2rem);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .section.active {
+            display: block;
+        }
+
+        /* Profile Section */
+        .profile-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 2rem 1.5rem;
+            border-radius: 1rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin: 0 auto 1rem;
+            border: 4px solid white;
+            position: relative;
+            cursor: pointer;
+        }
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .avatar-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .profile-avatar:hover .avatar-overlay {
+            opacity: 1;
+        }
+        .avatar-overlay i {
+            color: white;
+            font-size: 1.5rem;
+        }
+        .profile-stats {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: 0.5rem;
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+        .game-card {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            text-align: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid #e5e7eb;
+        }
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .game-icon {
+            font-size: 2.5rem;
+            color: var(--secondary-color); /* Yangilangan rang */
+            margin-bottom: 0.5rem;
+        }
+        .game-card h3 {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        .game-card p {
+            font-size: 0.85rem;
+            color: #6b7280;
+            min-height: 2.5rem;
+        }
+        .game-stats {
+            margin-top: 0.75rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid #f3f4f6;
+            font-size: 0.8rem;
+            color: #4b5563;
+        }
+
+        /* Game Sections Header */
+        .game-header {
+            display: flex;
+            align-items: center;
+            background-color: white;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+        .game-header h2 {
+            flex-grow: 1;
+            text-align: center;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        .back-btn {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            font-size: 1.25rem;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: background-color 0.2s;
+        }
+        .back-btn:hover {
+            background-color: #eef2ff;
+        }
+
+        /* Universal Game Content Styles */
+        .game-content > div {
+            padding: 1.5rem;
+            background: var(--card-bg);
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            display: none;
+        }
+        .game-content > div.active {
+            display: block;
+        }
+
+        .settings-screen h3, .input-screen h3, .results-screen h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .setting-group {
+            margin-bottom: 1rem;
+        }
+        .setting-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #374151;
+        }
+        .setting-group input, .setting-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .setting-group input:focus, .setting-group select:focus {
+            border-color: var(--primary-color);
+            ring: 3px;
+            outline: none;
+        }
+
+        .start-btn, .check-btn, .home-btn, .retry-btn {
+            width: 100%;
+            padding: 1rem;
+            margin-top: 1.5rem;
+            border-radius: 0.75rem;
+            font-size: 1.125rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.2s, opacity 0.3s;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .start-btn:active, .check-btn:active, .home-btn:active, .retry-btn:active {
+            transform: translateY(1px);
+            box-shadow: none;
+        }
+        /* Asosiy tugmalar (Start/Check) endi Primary rangda */
+        .start-btn, .check-btn {
+            background-color: var(--primary-color); 
+            color: white;
+            border: none;
+        }
+        .start-btn:hover, .check-btn:hover {
+            opacity: 0.85;
+        }
+        
+        .home-btn, .retry-btn {
+            background-color: #d1d5db;
+            color: #1f2937;
+            border: none;
+            margin-top: 0.5rem;
+        }
+        .retry-btn {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        /* Display Screen */
+        .timer {
+            text-align: center;
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--secondary-color); /* Yangilangan rang */
+            margin-bottom: 1.5rem;
+        }
+
+        /* So'zlar ro'yxatini ko'rsatish uslubi o'chirildi/o'zgartirildi */
+        /* .words-list uslubi endi ishlatilmaydi, uning o'rniga bitta katta so'z kartasi ishlatiladi */
+        
+        /* Input Screen */
+        .words-input-list {
+            display: grid;
+            gap: 1rem;
+        }
+        .input-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background-color: #f9fafb;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            border: 1px solid #e5e7eb;
+        }
+        .input-row .index {
+            width: 30px;
+            font-weight: 600;
+            color: var(--primary-color);
+            text-align: center;
+        }
+        .input-row input {
+            flex-grow: 1;
+            padding: 0.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+        }
+        .input-row input.correct {
+            border-color: var(--success-color);
+            background-color: #d1fae5;
+        }
+        .input-row input.incorrect {
+            border-color: var(--error-color);
+            background-color: #fee2e2;
+        }
+
+        /* Results Screen */
+        .score-display {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .score-circle {
+            width: 150px;
+            height: 150px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto;
+            font-size: 2.5rem;
+            font-weight: 800;
+            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.4);
+        }
+        .score-circle small {
+            font-size: 1rem;
+            font-weight: 400;
+            opacity: 0.8;
+        }
+
+        .results-comparison {
+            margin-bottom: 1.5rem;
+            border-top: 2px dashed #e5e7eb;
+            padding-top: 1rem;
+        }
+        .comparison-item {
+            padding: 0.5rem 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        .comparison-item:last-child {
+            border-bottom: none;
+        }
+        .comparison-word {
+            font-weight: 600;
+            color: #1f2937;
+        }
+        .comparison-result {
+            font-size: 0.9rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.5rem;
+            font-weight: 700;
+        }
+        .comparison-result.correct {
+            background-color: var(--success-color);
+            color: white;
+        }
+        .comparison-result.incorrect {
+            background-color: var(--error-color);
+            color: white;
+        }
+        .comparison-result.missed {
+            background-color: #fde047;
+            color: #78350f;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-direction: column;
+        }
+
+        /* Utility classes for screen transitions */
+        .screen-transition {
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* Modal styling (for alerts) */
+        .custom-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 50;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            animation: zoomIn 0.3s ease-out;
+        }
+
+        @keyframes zoomIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-content h4 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .modal-content p {
+            margin-bottom: 1.5rem;
+            color: #4b5563;
+        }
+
+        .modal-content button {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+
+        .modal-content button:hover {
+            background-color: #3730a3;
+        }
+
+    </style>
 </head>
 <body>
     <!-- Loading Screen -->
@@ -17,372 +483,840 @@
             <h2>Memory Master</h2>
             <p>Xotirani rivojlantirish o'yini</p>
             <div class="loading-bar">
-                <div class="loading-progress"></div>
+                <div id="loading-progress" class="loading-progress"></div>
             </div>
         </div>
     </div>
 
     <!-- Main App Container -->
-    <div id="app" class="app-container">
-        <!-- Profile Section -->
-        <div id="profile-section" class="section active">
-            <header class="profile-header">
-                <div class="profile-avatar">
-                    <img id="profile-image" src="" alt="Profil rasmi">
-                    <div class="avatar-overlay">
-                        <i class="fas fa-camera"></i>
+    <div id="app" class="app-container" style="display: none;">
+        <div class="max-w-4xl mx-auto px-4">
+            <!-- Profile Section -->
+            <div id="profile-section" class="section active">
+                <header class="profile-header">
+                    <div class="profile-avatar">
+                        <img id="profile-image" src="https://placehold.co/80x80/6366f1/ffffff?text=U" alt="Profil rasmi">
+                        <div class="avatar-overlay">
+                            <i class="fas fa-camera"></i>
+                        </div>
+                        <input type="file" id="avatar-upload" accept="image/*" style="display: none;">
                     </div>
-                    <input type="file" id="avatar-upload" accept="image/*" style="display: none;">
-                </div>
-                <h1 id="profile-name">Foydalanuvchi</h1>
-                <p class="profile-stats">
-                    <span id="total-score">0</span> ball • 
-                    <span id="games-played">0</span> o'yin
-                </p>
-            </header>
+                    <h1 id="profile-name">Foydalanuvchi ID: <span id="display-user-id">...</span></h1>
+                    <p class="profile-stats">
+                        <span id="total-score">0</span> ball • 
+                        <span id="games-played">0</span> o'yin
+                    </p>
+                </header>
 
-            <div class="games-grid">
-                <div class="game-card" data-game="numbers">
-                    <div class="game-icon">
-                        <i class="fas fa-sort-numeric-down"></i>
+                <div class="games-grid">
+                    <div class="game-card" data-game="numbers">
+                        <div class="game-icon">
+                            <i class="fas fa-sort-numeric-down"></i>
+                        </div>
+                        <h3>Raqamlar</h3>
+                        <p>Raqamlarni eslab qolishni mashq qiling (Faol emas)</p>
+                        <div class="game-stats">
+                            <span>Eng yaxshi: <strong id="numbers-best">0</strong></span>
+                        </div>
                     </div>
-                    <h3>Raqamlar</h3>
-                    <p>Raqamlarni eslab qolishni mashq qiling</p>
-                    <div class="game-stats">
-                        <span>Eng yaxshi: <strong id="numbers-best">0</strong></span>
-                    </div>
-                </div>
 
-                <div class="game-card" data-game="words">
-                    <div class="game-icon">
-                        <i class="fas fa-font"></i>
+                    <div class="game-card" data-game="words">
+                        <div class="game-icon">
+                            <i class="fas fa-font"></i>
+                        </div>
+                        <h3>So'zlar</h3>
+                        <p>Turli tillarda so'zlarni eslab qoling</p>
+                        <div class="game-stats">
+                            <span>Eng yaxshi: <strong id="words-best">0</strong></span>
+                        </div>
                     </div>
-                    <h3>So'zlar</h3>
-                    <p>Turli tillarda so'zlarni eslab qoling</p>
-                    <div class="game-stats">
-                        <span>Eng yaxshi: <strong id="words-best">0</strong></span>
-                    </div>
-                </div>
 
-                <div class="game-card" data-game="flashcards">
-                    <div class="game-icon">
-                        <i class="fas fa-layer-group"></i>
+                    <div class="game-card" data-game="flashcards">
+                        <div class="game-icon">
+                            <i class="fas fa-layer-group"></i>
+                        </div>
+                        <h3>Flashcards</h3>
+                        <p>Flashcardlar yordamida o'rganing (Faol emas)</p>
+                        <div class="game-stats">
+                            <span>Kartalar: <strong id="flashcards-count">0</strong></span>
+                        </div>
                     </div>
-                    <h3>Flashcards</h3>
-                    <p>Flashcardlar yordamida o'rganing</p>
-                    <div class="game-stats">
-                        <span>Kartalar: <strong id="flashcards-count">0</strong></span>
-                    </div>
-                </div>
 
-                <div class="game-card" data-game="faces">
-                    <div class="game-icon">
-                        <i class="fas fa-user-friends"></i>
+                    <div class="game-card" data-game="faces">
+                        <div class="game-icon">
+                            <i class="fas fa-user-friends"></i>
+                        </div>
+                        <h3>Yuz va Ismlar</h3>
+                        <p>Yuzlar va ismlarni eslab qoling (Faol emas)</p>
+                        <div class="game-stats">
+                            <span>Eng yaxshi: <strong id="faces-best">0</strong></span>
+                        </div>
                     </div>
-                    <h3>Yuz va Ismlar</h3>
-                    <p>Yuzlar va ismlarni eslab qoling</p>
-                    <div class="game-stats">
-                        <span>Eng yaxshi: <strong id="faces-best">0</strong></span>
-                    </div>
-                </div>
 
-                <div class="game-card" data-game="images">
-                    <div class="game-icon">
-                        <i class="fas fa-images"></i>
+                    <div class="game-card" data-game="images">
+                        <div class="game-icon">
+                            <i class="fas fa-images"></i>
+                        </div>
+                        <h3>Rasmlar Sahifasi</h3>
+                        <p>Rasmlarni eslab qolishni o'rganing (Faol emas)</p>
+                        <div class="game-stats">
+                            <span>Eng yaxshi: <strong id="images-best">0</strong></span>
+                        </div>
                     </div>
-                    <h3>Rasmlar Sahifasi</h3>
-                    <p>Rasmlarni eslab qolishni o'rganing</p>
-                    <div class="game-stats">
-                        <span>Eng yaxshi: <strong id="images-best">0</strong></span>
-                    </div>
-                </div>
 
-                <div class="game-card" data-game="results">
-                    <div class="game-icon">
-                        <i class="fas fa-chart-line"></i>
-                    </div>
-                    <h3>Mening Natijalarim</h3>
-                    <p>Barcha testlar natijalaringizni ko'ring</p>
-                    <div class="game-stats">
-                        <span>Jami: <strong id="total-games">0</strong> test</span>
+                    <div class="game-card" data-game="results">
+                        <div class="game-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h3>Mening Natijalarim</h3>
+                        <p>Barcha testlar natijalarini ko'ring (Faol emas)</p>
+                        <div class="game-stats">
+                            <span>Jami: <strong id="total-games">0</strong> test</span>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Numbers Game Section -->
-        <div id="numbers-section" class="section">
-            <div class="game-header">
-                <button class="back-btn">
-                    <i class="fas fa-arrow-left"></i>
-                </button>
-                <h2>Raqamlar O'yini</h2>
-            </div>
-
-            <div class="game-content">
-                <!-- Settings Screen -->
-                <div id="numbers-settings" class="settings-screen">
-                    <div class="setting-group">
-                        <label>Raqamlar soni:</label>
-                        <input type="number" id="numbers-count" min="3" max="50" value="10">
-                    </div>
-                    <div class="setting-group">
-                        <label>Eslab qolish vaqti (soniya):</label>
-                        <input type="number" id="numbers-time" min="5" max="300" value="30">
-                    </div>
-                    <button id="start-numbers" class="start-btn">Boshlash</button>
+            <!-- Numbers Game Section (Disabled, but structure kept) -->
+            <div id="numbers-section" class="section">
+                <!-- ... Numbers Game Content (disabled for this version) ... -->
+                <div class="game-header">
+                    <button class="back-btn" data-target="profile">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <h2>Raqamlar O'yini (Faol emas)</h2>
                 </div>
-
-                <!-- Display Screen -->
-                <div id="numbers-display" class="display-screen">
-                    <div class="timer" id="numbers-timer">30</div>
-                    <div class="numbers-grid" id="numbers-grid"></div>
-                </div>
-
-                <!-- Input Screen -->
-                <div id="numbers-input" class="input-screen">
-                    <h3>Raqamlarni eslab qoling</h3>
-                    <div class="input-grid" id="numbers-input-grid"></div>
-                    <button id="check-numbers" class="check-btn">Tekshirish</button>
-                </div>
-
-                <!-- Results Screen -->
-                <div id="numbers-results" class="results-screen">
-                    <h3>Natijalar</h3>
-                    <div class="score-display">
-                        <div class="score-circle">
-                            <span id="numbers-score">0</span>
-                            <small>ball</small>
-                        </div>
-                    </div>
-                    <div class="results-comparison" id="numbers-comparison"></div>
-                    <div class="action-buttons">
-                        <button class="home-btn">Bosh Sahifa</button>
-                        <button class="retry-btn">Qayta O'ynash</button>
+                <div class="game-content">
+                    <div class="settings-screen active">
+                        <p class="text-center text-red-500 font-semibold">Ushbu o'yin hali tayyor emas. Iltimos, "So'zlar" o'yinini sinab ko'ring.</p>
+                        <button class="home-btn mt-4">Bosh Sahifa</button>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Words Game Section -->
-        <div id="words-section" class="section">
-            <div class="game-header">
-                <button class="back-btn">
-                    <i class="fas fa-arrow-left"></i>
-                </button>
-                <h2>So'zlar O'yini</h2>
-            </div>
-
-            <div class="game-content">
-                <!-- Settings Screen -->
-                <div id="words-settings" class="settings-screen">
-                    <div class="setting-group">
-                        <label>Til:</label>
-                        <select id="words-language">
-                            <option value="english">Inglizcha</option>
-                            <option value="korean">Koreyscha</option>
-                            <option value="japanese">Yaponcha</option>
-                            <option value="chinese">Xitoycha</option>
-                            <option value="german">Nemischa</option>
-                            <option value="french">Fransuzcha</option>
-                            <option value="uzbek">O'zbekcha</option>
-                        </select>
-                    </div>
-                    <div class="setting-group">
-                        <label>So'zlar soni:</label>
-                        <input type="number" id="words-count" min="5" max="100" value="15">
-                    </div>
-                    <div class="setting-group">
-                        <label>Eslab qolish vaqti (soniya):</label>
-                        <input type="number" id="words-time" min="10" max="600" value="60">
-                    </div>
-                    <button id="start-words" class="start-btn">Boshlash</button>
+            <!-- Words Game Section -->
+            <div id="words-section" class="section">
+                <div class="game-header">
+                    <button class="back-btn" data-target="profile">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <h2>So'zlar O'yini</h2>
                 </div>
 
-                <!-- Display Screen -->
-                <div id="words-display" class="display-screen">
-                    <div class="timer" id="words-timer">60</div>
-                    <div class="words-list" id="words-list"></div>
-                </div>
-
-                <!-- Input Screen -->
-                <div id="words-input" class="input-screen">
-                    <h3>So'zlarni eslab qoling</h3>
-                    <div class="words-input-list" id="words-input-list"></div>
-                    <button id="check-words" class="check-btn">Tekshirish</button>
-                </div>
-
-                <!-- Results Screen -->
-                <div id="words-results" class="results-screen">
-                    <h3>So'zlar Natijalari</h3>
-                    <div class="score-display">
-                        <div class="score-circle">
-                            <span id="words-score">0</span>
-                            <small>ball</small>
+                <div id="words-game-content" class="game-content">
+                    <!-- Settings Screen -->
+                    <div id="words-settings" class="settings-screen active screen-transition">
+                        <div class="setting-group">
+                            <label>Til:</label>
+                            <select id="words-language">
+                                <option value="english">Inglizcha</option>
+                                <option value="korean">Koreyscha</option>
+                                <option value="japanese">Yaponcha</option>
+                                <option value="chinese">Xitoycha</option>
+                                <option value="german">Nemischa</option>
+                                <option value="french">Fransuzcha</option>
+                                <option value="uzbek">O'zbekcha</option>
+                            </select>
                         </div>
+                        <div class="setting-group">
+                            <label>So'zlar soni:</label>
+                            <input type="number" id="words-count" min="5" max="100" value="15">
+                        </div>
+                        <div class="setting-group">
+                            <label>Eslab qolish vaqti (soniya):</label>
+                            <input type="number" id="words-time" min="10" max="600" value="60">
+                        </div>
+                        <button id="start-words" class="start-btn">Boshlash</button>
                     </div>
-                    <div class="results-comparison" id="words-comparison"></div>
-                    <div class="action-buttons">
-                        <button class="home-btn">Bosh Sahifa</button>
-                        <button class="retry-btn">Qayta O'ynash</button>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <!-- Flashcards Section -->
-        <div id="flashcards-section" class="section">
-            <div class="game-header">
-                <button class="back-btn">
-                    <i class="fas fa-arrow-left"></i>
-                </button>
-                <h2>Flashcards</h2>
-            </div>
-
-            <div class="game-content">
-                <!-- Language Selection -->
-                <div id="flashcards-language" class="settings-screen">
-                    <h3>Tilni tanlang</h3>
-                    <div class="languages-grid">
-                        <div class="language-card" data-lang="english">
-                            <i class="fas fa-globe-americas"></i>
-                            <span>Inglizcha</span>
-                        </div>
-                        <div class="language-card" data-lang="korean">
-                            <i class="fas fa-globe-asia"></i>
-                            <span>Koreyscha</span>
-                        </div>
-                        <div class="language-card" data-lang="japanese">
-                            <i class="fas fa-globe-asia"></i>
-                            <span>Yaponcha</span>
-                        </div>
-                        <div class="language-card" data-lang="chinese">
-                            <i class="fas fa-globe-asia"></i>
-                            <span>Xitoycha</span>
-                        </div>
-                        <div class="language-card" data-lang="german">
-                            <i class="fas fa-globe-europe"></i>
-                            <span>Nemischa</span>
-                        </div>
-                        <div class="language-card" data-lang="french">
-                            <i class="fas fa-globe-europe"></i>
-                            <span>Fransuzcha</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Topics Selection -->
-                <div id="flashcards-topics" class="settings-screen">
-                    <h3>Mavzuni tanlang</h3>
-                    <div class="topics-grid" id="topics-grid"></div>
-                </div>
-
-                <!-- Flashcards Practice -->
-                <div id="flashcards-practice" class="flashcards-screen">
-                    <div class="flashcard-container">
-                        <div class="flashcard" id="flashcard">
-                            <div class="flashcard-front">
-                                <div class="flashcard-word" id="flashcard-word"></div>
-                                <div class="flashcard-pronunciation" id="flashcard-pronunciation"></div>
+                    <!-- Display Screen (Yangi, yagona so'z ko'rinishi) -->
+                    <div id="words-display" class="display-screen">
+                        <div class="timer" id="words-timer">60</div>
+                        
+                        <div id="word-card-container" class="bg-white p-8 rounded-xl shadow-lg border border-gray-200">
+                            <p class="text-sm font-semibold uppercase text-gray-500 mb-2 text-center">
+                                So'z <span id="current-word-number">0</span> / <span id="total-words-count">0</span>
+                            </p>
+                            <h3 id="current-word-display" class="text-5xl font-bold text-center text-indigo-700 mb-6 min-h-[60px] flex items-center justify-center transition-opacity duration-300">...</h3>
+                            
+                            <!-- Navigatsiya Tugmalari -->
+                            <div class="flex justify-between mt-4">
+                                <button id="prev-word-btn" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 disabled:opacity-50 transition">
+                                    <i class="fas fa-chevron-left"></i> Oldingi
+                                </button>
+                                <button id="next-word-btn" class="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 disabled:opacity-50 transition">
+                                    Keyingi <i class="fas fa-chevron-right"></i>
+                                </button>
                             </div>
-                            <div class="flashcard-back">
-                                <div class="flashcard-translation" id="flashcard-translation"></div>
-                                <div class="flashcard-pronunciation" id="flashcard-back-pronunciation"></div>
+                            <p class="text-xs text-gray-500 mt-4 text-center">Navigatsiya: ▲ va ▼ tugmachalari</p>
+                        </div>
+
+                        <button id="start-input-btn" class="start-btn mt-6 w-full max-w-sm mx-auto block">Eslab Qoldim (Kirishga O'tish)</button>
+
+                        <!-- Eski words-list o'chirildi: <div class="words-list" id="words-list"></div> -->
+                    </div>
+
+                    <!-- Input Screen -->
+                    <div id="words-input" class="input-screen">
+                        <h3>Eslab qolgan so'zlarni kiriting</h3>
+                        <p class="text-center text-sm text-gray-500 mb-4">So'zlarni berilgan tartibda kiriting.</p>
+                        <div class="words-input-list" id="words-input-list"></div>
+                        <button id="check-words" class="check-btn">Tekshirish</button>
+                    </div>
+
+                    <!-- Results Screen -->
+                    <div id="words-results" class="results-screen">
+                        <h3>So'zlar Natijalari</h3>
+                        <div class="score-display">
+                            <div class="score-circle">
+                                <span id="words-score">0</span>
+                                <small>ball</small>
                             </div>
                         </div>
-                    </div>
-                    <div class="flashcard-controls">
-                        <button id="flip-card" class="flip-btn">
-                            <i class="fas fa-sync"></i> Aylantirish
-                        </button>
-                        <button id="next-card" class="next-btn">
-                            Keyingi <i class="fas fa-arrow-right"></i>
-                        </button>
-                    </div>
-                    <div class="progress-info">
-                        <span id="card-progress">1/20</span>
-                        <button id="finish-cards" class="finish-btn">Tayyorman</button>
-                    </div>
-                </div>
-
-                <!-- Flashcards Test -->
-                <div id="flashcards-test" class="input-screen">
-                    <h3>So'zlarni eslab qoling</h3>
-                    <div class="test-type-selector">
-                        <button class="test-type-btn active" data-type="foreignToNative">
-                            Chet til → Tarjima
-                        </button>
-                        <button class="test-type-btn" data-type="nativeToForeign">
-                            Tarjima → Chet til
-                        </button>
-                    </div>
-                    <div class="test-words-list" id="test-words-list"></div>
-                    <button id="check-flashcards" class="check-btn">Tekshirish</button>
-                </div>
-
-                <!-- Flashcards Results -->
-                <div id="flashcards-results" class="results-screen">
-                    <h3>Flashcards Natijalari</h3>
-                    <div class="score-display">
-                        <div class="score-circle">
-                            <span id="flashcards-score">0</span>
-                            <small>ball</small>
+                        <div class="results-comparison" id="words-comparison">
+                            <!-- Comparison list will be inserted here -->
+                        </div>
+                        <div class="action-buttons">
+                            <button class="home-btn" data-target="profile">Bosh Sahifa</button>
+                            <button class="retry-btn" data-target="words-settings">Qayta O'ynash</button>
                         </div>
                     </div>
-                    <div class="results-comparison" id="flashcards-comparison"></div>
-                    <div class="action-buttons">
-                        <button class="home-btn">Bosh Sahifa</button>
-                        <button class="retry-btn">Qayta O'ynash</button>
+                </div>
+            </div>
+
+            <!-- Flashcards Section (Disabled) -->
+            <div id="flashcards-section" class="section">
+                <div class="game-header">
+                    <button class="back-btn" data-target="profile">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <h2>Flashcards (Faol emas)</h2>
+                </div>
+                <div class="game-content">
+                    <div class="settings-screen active">
+                        <p class="text-center text-red-500 font-semibold">Ushbu o'yin hali tayyor emas. Iltimos, "So'zlar" o'yinini sinab ko'ring.</p>
+                        <button class="home-btn mt-4">Bosh Sahifa</button>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Results Section -->
-        <div id="results-section" class="section">
-            <div class="game-header">
-                <button class="back-btn">
-                    <i class="fas fa-arrow-left"></i>
-                </button>
-                <h2>Mening Natijalarim</h2>
-            </div>
-
-            <div class="results-content">
-                <div class="stats-overview">
-                    <div class="stat-card">
-                        <i class="fas fa-gamepad"></i>
-                        <h3 id="total-games-played">0</h3>
-                        <p>Jami O'yinlar</p>
-                    </div>
-                    <div class="stat-card">
-                        <i class="fas fa-trophy"></i>
-                        <h3 id="average-score">0</h3>
-                        <p>O'rtacha Ball</p>
-                    </div>
-                    <div class="stat-card">
-                        <i class="fas fa-brain"></i>
-                        <h3 id="best-score">0</h3>
-                        <p>Eng Yaxshi Natija</p>
-                    </div>
+            <!-- Results Section (Disabled) -->
+            <div id="results-section" class="section">
+                <div class="game-header">
+                    <button class="back-btn" data-target="profile">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <h2>Mening Natijalarim (Faol emas)</h2>
                 </div>
-
-                <div class="results-history">
-                    <h3>O'yinlar Tarixi</h3>
-                    <div class="history-list" id="history-list"></div>
+                <div class="game-content">
+                    <div class="settings-screen active">
+                        <p class="text-center text-red-500 font-semibold">Ushbu bo'lim hali tayyor emas.</p>
+                        <button class="home-btn mt-4">Bosh Sahifa</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Script Files -->
-    <script src="data.js"></script>
-    <script src="utils/storage.js"></script>
-    <script src="utils/helpers.js"></script>
-    <script src="modules/numbers.js"></script>
-    <script src="modules/words.js"></script>
-    <script src="modules/flashcards.js"></script>
-    <script src="modules/faces.js"></script>
-    <script src="modules/images.js"></script>
-    <script src="app.js"></script>
+    <!-- Custom Modal for Alerts/Confirmations -->
+    <div id="custom-modal" class="custom-modal hidden">
+        <div class="modal-content">
+            <h4 id="modal-title">Xabar</h4>
+            <p id="modal-message">Bu shaxsiy xabar.</p>
+            <button id="modal-ok">OK</button>
+        </div>
+    </div>
+
+    <!-- JavaScript Logics -->
+    <script type="module">
+        // Firebase imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, collection, query, limit, orderBy, runTransaction, Timestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global Firebase and App state
+        let app;
+        let db;
+        let auth;
+        let userId = null;
+        let userData = {
+            totalScore: 0,
+            gamesPlayed: 0,
+            bestScores: { words: 0 },
+        };
+        let isAuthReady = false;
+
+        // Configuration
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // Custom Modal Implementation (Uzbek equivalent of alert/confirm)
+        function showModal(title, message, callback) {
+            const modal = document.getElementById('custom-modal');
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-message').textContent = message;
+            
+            const okButton = document.getElementById('modal-ok');
+            okButton.onclick = () => {
+                modal.classList.add('hidden');
+                if (callback) callback();
+            };
+            modal.classList.remove('hidden');
+        }
+
+        // --- Utils: Helpers and Storage (Firestore) ---
+
+        /** Generates a shuffled array from the input array. */
+        function shuffle(array) {
+            let currentIndex = array.length, randomIndex;
+            while (currentIndex !== 0) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+                [array[currentIndex], array[randomIndex]] = [
+                    array[randomIndex], array[currentIndex]
+                ];
+            }
+            return array;
+        }
+
+        /** Firestore Utility: Saves or updates user data. */
+        async function saveUserData(dataToMerge) {
+            if (!isAuthReady || !userId) {
+                console.warn("Firestore tayyor emas yoki foydalanuvchi ID yo'q.");
+                return;
+            }
+            try {
+                const userDocRef = doc(db, 'artifacts', appId, 'users', userId, 'profile', 'data');
+                await setDoc(userDocRef, dataToMerge, { merge: true });
+                console.log("Foydalanuvchi ma'lumotlari yangilandi.");
+            } catch (e) {
+                console.error("Foydalanuvchi ma'lumotlarini saqlashda xato: ", e);
+            }
+        }
+
+        /** Firestore Utility: Saves a game result. */
+        async function saveGameResult(gameType, score, details = {}) {
+            if (!isAuthReady || !userId) {
+                console.warn("Firestore tayyor emas yoki foydalanuvchi ID yo'q. Natija saqlanmadi.");
+                return;
+            }
+            try {
+                // Use a transaction to safely update both profile stats and save the new score
+                await runTransaction(db, async (transaction) => {
+                    // 1. Save individual result
+                    const resultsColRef = collection(db, 'artifacts', appId, 'users', userId, `${gameType}_scores`);
+                    const newResultRef = doc(resultsColRef);
+                    transaction.set(newResultRef, {
+                        score: score,
+                        gameType: gameType,
+                        timestamp: Timestamp.now(),
+                        ...details
+                    });
+
+                    // 2. Update profile statistics
+                    const profileDocRef = doc(db, 'artifacts', appId, 'users', userId, 'profile', 'data');
+                    const profileDoc = await transaction.get(profileDocRef);
+                    
+                    let currentData = profileDoc.data() || {
+                        totalScore: 0,
+                        gamesPlayed: 0,
+                        bestScores: {}
+                    };
+                    
+                    const newTotalScore = currentData.totalScore + score;
+                    const newGamesPlayed = currentData.gamesPlayed + 1;
+                    const currentBest = currentData.bestScores[gameType] || 0;
+                    const newBest = Math.max(currentBest, score);
+
+                    transaction.update(profileDocRef, {
+                        totalScore: newTotalScore,
+                        gamesPlayed: newGamesPlayed,
+                        [`bestScores.${gameType}`]: newBest
+                    });
+
+                    // Update local state for immediate UI refresh
+                    userData.totalScore = newTotalScore;
+                    userData.gamesPlayed = newGamesPlayed;
+                    userData.bestScores[gameType] = newBest;
+                    
+                    updateProfileUI();
+                });
+                console.log("O'yin natijasi va profil muvaffaqiyatli saqlandi.");
+            } catch (e) {
+                console.error("Natijani saqlashda tranzaksiya xatosi: ", e);
+                showModal("Xato", "Natijalarni saqlashda xato yuz berdi. Iltimos, qayta urinib ko'ring.");
+            }
+        }
+
+        // --- Data Definitions (Replaces data.js) ---
+
+        const WORDS_DATA = {
+            english: [
+                "Apple", "Banana", "Cat", "Dog", "House", "Car", "Book", "Tree", "Water", "Sun",
+                "Moon", "Star", "Cloud", "River", "Mountain", "Road", "Time", "People", "Work", "Life"
+            ],
+            korean: [
+                "사과", "바나나", "고양이", "개", "집", "자동차", "책", "나무", "물", "태양",
+                "달", "별", "구름", "강", "산", "길", "시간", "사람", "일", "삶"
+            ],
+            japanese: [
+                "りんご", "バナナ", "猫", "犬", "家", "車", "本", "木", "水", "太陽",
+                "月", "星", "雲", "川", "山", "道", "時間", "人", "仕事", "人生"
+            ],
+            chinese: [
+                "苹果", "香蕉", "猫", "狗", "房子", "汽车", "书", "树", "水", "太阳",
+                "月亮", "星星", "云", "河", "山", "路", "时间", "人", "工作", "生活"
+            ],
+            german: [
+                "Apfel", "Banane", "Katze", "Hund", "Haus", "Auto", "Buch", "Baum", "Wasser", "Sonne",
+                "Mond", "Stern", "Wolke", "Fluss", "Berg", "Straße", "Zeit", "Leute", "Arbeit", "Leben"
+            ],
+            french: [
+                "Pomme", "Banane", "Chat", "Chien", "Maison", "Voiture", "Livre", "Arbre", "Eau", "Soleil",
+                "Lune", "Étoile", "Nuage", "Fleuve", "Montagne", "Route", "Temps", "Gens", "Travail", "Vie"
+            ],
+            uzbek: [
+                "Olma", "Banan", "Mushuk", "It", "Uy", "Mashina", "Kitob", "Daraxt", "Suv", "Quyosh",
+                "Oy", "Yulduz", "Bulut", "Daryo", "Tog'", "Yo'l", "Vaqt", "Odamlar", "Ish", "Hayot"
+            ]
+        };
+
+
+        // --- Module: Words Game Logic (Yangilandi: Birma-bir ko'rsatish va navigatsiya uchun) ---
+
+        class WordsGame {
+            constructor() {
+                this.originalWords = [];
+                this.settings = {};
+                this.timer = null;
+                this.currentWordIndex = 0; // Joriy so'zning indeksi
+            }
+
+            // Shows the specified screen within the words-section
+            showScreen(screenId) {
+                const screens = document.querySelectorAll('#words-game-content > div');
+                screens.forEach(screen => {
+                    screen.classList.remove('active');
+                });
+                document.getElementById(screenId).classList.add('active', 'screen-transition');
+            }
+
+            // Initializes and starts the game from settings
+            start(count, time, language) {
+                if (count < 5 || count > 100 || time < 10 || time > 600) {
+                    showModal("Xato", "Iltimos, so'zlar sonini (5-100) va vaqtni (10-600) to'g'ri kiriting.");
+                    return;
+                }
+
+                this.settings = { count, time, language };
+
+                const allWords = WORDS_DATA[language];
+                if (!allWords || allWords.length < count) {
+                    showModal("Xato", `Tanlangan til uchun ${count} ta so'z yetarli emas. ${language} tilida atigi ${allWords.length} ta so'z bor.`);
+                    return;
+                }
+
+                // Get a subset and shuffle it
+                const subset = shuffle([...allWords]).slice(0, count);
+                this.originalWords = subset;
+
+                this.displayWords();
+            }
+
+            // Renders the current word and updates controls
+            renderCurrentWord() {
+                const wordDisplayEl = document.getElementById('current-word-display');
+                const currentNumEl = document.getElementById('current-word-number');
+                const totalCountEl = document.getElementById('total-words-count');
+                const prevBtn = document.getElementById('prev-word-btn');
+                const nextBtn = document.getElementById('next-word-btn');
+
+                if (this.originalWords.length === 0) return;
+
+                // Animatsiya uchun biroz shaffoflikni o'zgartirish
+                wordDisplayEl.style.opacity = '0';
+                
+                // So'zni yangilash
+                setTimeout(() => {
+                    wordDisplayEl.textContent = this.originalWords[this.currentWordIndex];
+                    wordDisplayEl.style.opacity = '1';
+                }, 150); // Engil animatsiya
+
+                currentNumEl.textContent = this.currentWordIndex + 1;
+                totalCountEl.textContent = this.originalWords.length;
+                
+                // Tugmalarni faollashtirish/o'chirish
+                prevBtn.disabled = this.currentWordIndex === 0;
+                nextBtn.disabled = this.currentWordIndex === this.originalWords.length - 1;
+            }
+
+            // Navigatsiya funksiyalari
+            goToNextWord() {
+                if (this.currentWordIndex < this.originalWords.length - 1) {
+                    this.currentWordIndex++;
+                    this.renderCurrentWord();
+                }
+            }
+
+            goToPreviousWord() {
+                if (this.currentWordIndex > 0) {
+                    this.currentWordIndex--;
+                    this.renderCurrentWord();
+                }
+            }
+            
+            // Displays the words to be memorized (Modified)
+            displayWords() {
+                this.showScreen('words-display');
+                this.currentWordIndex = 0; // Boshlashda indeksni nolga qaytarish
+                
+                document.getElementById('total-words-count').textContent = this.settings.count;
+                this.renderCurrentWord();
+
+                const timerEl = document.getElementById('words-timer');
+                let remainingTime = this.settings.time;
+                timerEl.textContent = remainingTime;
+
+                if (this.timer) clearInterval(this.timer);
+
+                this.timer = setInterval(() => {
+                    remainingTime--;
+                    timerEl.textContent = remainingTime;
+                    if (remainingTime <= 0) {
+                        clearInterval(this.timer);
+                        this.enterInputPhase();
+                    }
+                }, 1000);
+            }
+
+            // Transitions to the input screen and sets up inputs
+            enterInputPhase() {
+                this.showScreen('words-input');
+                const inputGridEl = document.getElementById('words-input-list');
+                inputGridEl.innerHTML = '';
+
+                // Create input fields based on the memorized word count
+                for (let i = 0; i < this.settings.count; i++) {
+                    const row = document.createElement('div');
+                    row.className = 'input-row';
+                    row.innerHTML = `
+                        <span class="index">${i + 1}.</span>
+                        <input type="text" data-index="${i}" placeholder="So'zni kiriting" autocapitalize="off" spellcheck="false" class="w-full text-center">
+                    `;
+                    inputGridEl.appendChild(row);
+                }
+
+                // Focus on the first input
+                inputGridEl.querySelector('input')?.focus();
+            }
+
+            // Checks the user's input against the original list
+            checkResults() {
+                clearInterval(this.timer);
+                const inputFields = document.querySelectorAll('#words-input-list input');
+                const userInputs = Array.from(inputFields).map(input => input.value.trim().toLowerCase());
+                const original = this.originalWords.map(word => word.toLowerCase());
+                
+                let correctCount = 0;
+                let detailedResults = [];
+
+                for (let i = 0; i < this.settings.count; i++) {
+                    const originalWord = original[i];
+                    const userInput = userInputs[i];
+                    let isCorrect = false;
+
+                    // Trim va kichik harflarga o'tkazish orqali tekshirish
+                    if (userInput === originalWord) {
+                        isCorrect = true;
+                        correctCount++;
+                        // Natijalarni ko'rsatish uchun input maydonlari rangini yangilash
+                        inputFields[i].classList.add('correct');
+                        inputFields[i].disabled = true;
+                    } else if (userInput) {
+                        inputFields[i].classList.add('incorrect');
+                        inputFields[i].disabled = true;
+                    }
+
+                    detailedResults.push({
+                        original: this.originalWords[i], // Asl bosh harfda saqlash
+                        user: userInputs[i] || '', // Foydalanuvchi kiritganini saqlash
+                        isCorrect: isCorrect,
+                    });
+                }
+                
+                // Score is simply the number of correct words
+                const finalScore = correctCount;
+
+                // Display results and save them
+                this.displayResults(finalScore, detailedResults);
+                
+                // Save to Firestore
+                saveGameResult('words', finalScore, {
+                    totalWords: this.settings.count,
+                    correctWords: finalScore,
+                    language: this.settings.language,
+                    timeLimit: this.settings.time,
+                    results: detailedResults.map(r => ({ o: r.original, u: r.user, c: r.isCorrect }))
+                });
+            }
+
+            // Displays the final score and comparison
+            displayResults(score, results) {
+                this.showScreen('words-results');
+                document.getElementById('words-score').textContent = score;
+                const comparisonEl = document.getElementById('words-comparison');
+                comparisonEl.innerHTML = `
+                    <p class="text-center text-lg font-semibold mb-2">
+                        To'g'ri javoblar: ${score} / ${this.settings.count}
+                    </p>
+                `;
+
+                results.forEach((res, index) => {
+                    const row = document.createElement('div');
+                    row.className = 'comparison-item';
+                    
+                    let statusText, statusClass;
+
+                    if (res.isCorrect) {
+                        statusText = "To'g'ri";
+                        statusClass = 'correct';
+                    } else if (res.user) {
+                        statusText = "Xato";
+                        statusClass = 'incorrect';
+                    } else {
+                        statusText = "O'tkazib yuborilgan";
+                        statusClass = 'missed';
+                    }
+
+                    row.innerHTML = `
+                        <div class="flex flex-col text-left">
+                            <span class="comparison-word text-sm md:text-base">${index + 1}. ${res.original}</span>
+                            <span class="text-xs text-gray-500 italic">Sizning javobingiz: ${res.user || '...'}</span>
+                        </div>
+                        <span class="comparison-result ${statusClass}">${statusText}</span>
+                    `;
+                    comparisonEl.appendChild(row);
+                });
+            }
+
+            // Resets the game to the settings screen
+            reset() {
+                if (this.timer) clearInterval(this.timer);
+                this.showScreen('words-settings');
+            }
+        }
+
+        const wordsGame = new WordsGame();
+        let currentGameScreen = 'profile-section'; // Initial screen
+
+        // --- UI & Navigation Logic (Replaces app.js) ---
+
+        function updateProfileUI() {
+            document.getElementById('display-user-id').textContent = userId || 'Mehmon';
+            document.getElementById('total-score').textContent = userData.totalScore.toLocaleString();
+            document.getElementById('games-played').textContent = userData.gamesPlayed.toLocaleString();
+            
+            // Update Words Best Score
+            document.getElementById('words-best').textContent = userData.bestScores.words || 0;
+            
+            // Update total games summary on the profile section
+            document.getElementById('total-games').textContent = userData.gamesPlayed.toLocaleString();
+        }
+
+        // Global Navigation Handler
+        function navigateTo(targetId) {
+            const allSections = document.querySelectorAll('.section');
+            allSections.forEach(section => section.classList.remove('active'));
+            
+            const targetSection = document.getElementById(targetId);
+            if (targetSection) {
+                targetSection.classList.add('active');
+                currentGameScreen = targetId;
+                window.scrollTo(0, 0); // Scroll to top on navigation
+            }
+        }
+
+        // Event Listeners Setup
+        function setupEventListeners() {
+            // Main game card click (navigate to game section)
+            document.querySelectorAll('.game-card').forEach(card => {
+                card.addEventListener('click', (e) => {
+                    const gameType = card.dataset.game;
+                    if (gameType === 'words') {
+                        navigateTo('words-section');
+                        wordsGame.reset();
+                    } else if (gameType === 'profile' || gameType === 'results') {
+                        // For the purpose of this focused file, other games are disabled.
+                        showModal("O'yin Faol Emas", `"${card.querySelector('h3').textContent}" o'yini hali tugallanmagan. Iltimos, "So'zlar" o'yinini sinab ko'ring.`);
+                    } else {
+                        navigateTo('profile-section');
+                    }
+                });
+            });
+
+            // Back/Home buttons (navigate back to profile)
+            document.querySelectorAll('.back-btn, .home-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    navigateTo('profile-section');
+                });
+            });
+
+            // --- Words Game Specific Listeners ---
+            
+            // Start Words Game button
+            document.getElementById('start-words').addEventListener('click', () => {
+                const count = parseInt(document.getElementById('words-count').value);
+                const time = parseInt(document.getElementById('words-time').value);
+                const language = document.getElementById('words-language').value;
+                wordsGame.start(count, time, language);
+            });
+
+            // Check Words button
+            document.getElementById('check-words').addEventListener('click', () => {
+                wordsGame.checkResults();
+            });
+
+            // Retry button on Words Results screen
+            document.querySelector('#words-results .retry-btn').addEventListener('click', () => {
+                wordsGame.reset();
+            });
+
+            // Display Screen Navigation Buttons
+            document.getElementById('prev-word-btn').addEventListener('click', () => {
+                wordsGame.goToPreviousWord();
+            });
+
+            document.getElementById('next-word-btn').addEventListener('click', () => {
+                wordsGame.goToNextWord();
+            });
+            
+            // Explicit button to start input (stop timer and transition)
+            document.getElementById('start-input-btn').addEventListener('click', () => {
+                if (wordsGame.timer) clearInterval(wordsGame.timer); // Stop timer if running
+                wordsGame.enterInputPhase();
+            });
+
+
+            // Keyboard Navigation Listener (Arrow Up/Down)
+            document.addEventListener('keydown', (e) => {
+                // Faqat 'words-display' ekrani faol bo'lgandagina ishga tushirish
+                if (currentGameScreen !== 'words-section' || !document.getElementById('words-display').classList.contains('active')) {
+                    return;
+                }
+
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    wordsGame.goToNextWord();
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    wordsGame.goToPreviousWord();
+                }
+            });
+        }
+
+        // --- Firebase Initialization and Auth ---
+
+        async function initFirebase() {
+            if (!firebaseConfig) {
+                console.error("Firebase config topilmadi. Ilovani ishga tushirish mumkin emas.");
+                showModal("Xato", "Tizim sozlamalari yuklanmadi. Iltimos, keyinroq urinib ko'ring.");
+                return;
+            }
+
+            try {
+                setLogLevel('error'); // Only log errors and warnings for clean console
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                // Authentication using custom token or anonymously
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                // Wait for auth state change to get the final user ID
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        console.log("Foydalanuvchi muvaffaqiyatli autentifikatsiyadan o'tdi. ID:", userId);
+                        isAuthReady = true;
+                        loadUserData();
+                    } else {
+                        // Fallback: If anonymous sign-in failed, use a random ID (won't save to Firestore without login)
+                        userId = 'guest-' + (crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2, 9));
+                        console.warn("Autentifikatsiya muvaffaqiyatsiz tugadi, Mehmon ID yaratildi:", userId);
+                        isAuthReady = true;
+                        updateProfileUI(); // Update UI with fallback/guest data
+                        hideLoadingScreen();
+                    }
+                });
+
+            } catch (e) {
+                console.error("Firebase ishga tushirishda xato:", e);
+                showModal("Tizim Xatosi", "Firebase ishga tushirishda xato yuz berdi: " + e.message);
+                isAuthReady = true;
+                hideLoadingScreen();
+            }
+        }
+
+        /** Loads user data from Firestore using an onSnapshot listener. */
+        function loadUserData() {
+            if (!isAuthReady || !userId) return;
+
+            const userDocRef = doc(db, 'artifacts', appId, 'users', userId, 'profile', 'data');
+            
+            // Listen for real-time updates to user profile data
+            onSnapshot(userDocRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    userData.totalScore = data.totalScore || 0;
+                    userData.gamesPlayed = data.gamesPlayed || 0;
+                    userData.bestScores = data.bestScores || {};
+                    console.log("Foydalanuvchi ma'lumotlari Firestore'dan yuklandi.");
+                } else {
+                    console.log("Foydalanuvchi profili mavjud emas. Yangi profil yaratilmoqda.");
+                    // Create initial profile data if it doesn't exist
+                    saveUserData({
+                        totalScore: 0,
+                        gamesPlayed: 0,
+                        bestScores: { words: 0 },
+                        createdAt: Timestamp.now()
+                    });
+                }
+                updateProfileUI();
+                hideLoadingScreen();
+            }, (error) => {
+                console.error("Profil ma'lumotlarini yuklashda xato:", error);
+                hideLoadingScreen();
+            });
+        }
+
+        // --- Loading Screen Management ---
+        function showLoadingScreen() {
+            document.getElementById('loading-screen').classList.remove('hidden');
+            document.getElementById('app').style.display = 'none';
+        }
+
+        function hideLoadingScreen() {
+            // Simulate loading progress
+            document.getElementById('loading-progress').style.width = '100%'; 
+            setTimeout(() => {
+                document.getElementById('loading-screen').classList.add('hidden');
+                document.getElementById('app').style.display = 'block';
+            }, 500);
+        }
+
+        // --- App Initialization ---
+        window.onload = async () => {
+            showLoadingScreen();
+            setupEventListeners();
+            await initFirebase();
+        };
+
+    </script>
 </body>
 </html>
