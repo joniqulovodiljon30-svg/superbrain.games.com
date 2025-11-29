@@ -299,9 +299,6 @@
             margin-bottom: 1.5rem;
         }
 
-        /* So'zlar ro'yxatini ko'rsatish uslubi o'chirildi/o'zgartirildi */
-        /* .words-list uslubi endi ishlatilmaydi, uning o'rniga bitta katta so'z kartasi ishlatiladi */
-        
         /* Input Screen */
         .words-input-list {
             display: grid;
@@ -784,22 +781,23 @@
         /** Firestore Utility: Saves or updates user data. */
         async function saveUserData(dataToMerge) {
             if (!isAuthReady || !userId) {
-                console.warn("Firestore tayyor emas yoki foydalanuvchi ID yo'q.");
+                console.warn("DIQQAT: Firestore tayyor emas yoki foydalanuvchi ID yo'q. Ma'lumot saqlanmadi.");
                 return;
             }
             try {
                 const userDocRef = doc(db, 'artifacts', appId, 'users', userId, 'profile', 'data');
                 await setDoc(userDocRef, dataToMerge, { merge: true });
-                console.log("Foydalanuvchi ma'lumotlari yangilandi.");
+                console.log("SUCCESS: Foydalanuvchi ma'lumotlari yangilandi.");
             } catch (e) {
-                console.error("Foydalanuvchi ma'lumotlarini saqlashda xato: ", e);
+                console.error("FIREBASE XATOSI: Foydalanuvchi ma'lumotlarini saqlashda xato: ", e);
+                showModal("Xato", "Profil ma'lumotlarini saqlashda xato yuz berdi. Konsolni tekshiring.");
             }
         }
 
         /** Firestore Utility: Saves a game result. */
         async function saveGameResult(gameType, score, details = {}) {
             if (!isAuthReady || !userId) {
-                console.warn("Firestore tayyor emas yoki foydalanuvchi ID yo'q. Natija saqlanmadi.");
+                console.warn("DIQQAT: Firestore tayyor emas yoki foydalanuvchi ID yo'q. Natija saqlanmadi.");
                 return;
             }
             try {
@@ -843,10 +841,10 @@
                     
                     updateProfileUI();
                 });
-                console.log("O'yin natijasi va profil muvaffaqiyatli saqlandi.");
+                console.log("SUCCESS: O'yin natijasi va profil muvaffaqiyatli saqlandi.");
             } catch (e) {
-                console.error("Natijani saqlashda tranzaksiya xatosi: ", e);
-                showModal("Xato", "Natijalarni saqlashda xato yuz berdi. Iltimos, qayta urinib ko'ring.");
+                console.error("FIREBASE XATOSI: Natijani saqlashda tranzaksiya xatosi: ", e);
+                showModal("Xato", "Natijalarni saqlashda xato yuz berdi. Iltimos, konsolni tekshiring.");
             }
         }
 
@@ -884,14 +882,14 @@
         };
 
 
-        // --- Module: Words Game Logic (Yangilandi: Birma-bir ko'rsatish va navigatsiya uchun) ---
+        // --- Module: Words Game Logic ---
 
         class WordsGame {
             constructor() {
                 this.originalWords = [];
                 this.settings = {};
                 this.timer = null;
-                this.currentWordIndex = 0; // Joriy so'zning indeksi
+                this.currentWordIndex = 0; 
             }
 
             // Shows the specified screen within the words-section
@@ -1111,7 +1109,7 @@
         const wordsGame = new WordsGame();
         let currentGameScreen = 'profile-section'; // Initial screen
 
-        // --- UI & Navigation Logic (Replaces app.js) ---
+        // --- UI & Navigation Logic ---
 
         function updateProfileUI() {
             document.getElementById('display-user-id').textContent = userId || 'Mehmon';
@@ -1220,13 +1218,14 @@
 
         async function initFirebase() {
             if (!firebaseConfig) {
-                console.error("Firebase config topilmadi. Ilovani ishga tushirish mumkin emas.");
-                showModal("Xato", "Tizim sozlamalari yuklanmadi. Iltimos, keyinroq urinib ko'ring.");
+                console.error("FIREBASE XATOSI: Firebase config topilmadi. Ilovani ishga tushirish mumkin emas.");
+                showModal("Tizim Xatosi", "Firebase sozlamalari yuklanmadi. Agar bu sizning saytingiz bo'lsa, sozlamalarni tekshiring.");
+                hideLoadingScreen(); // Xato bo'lsa ham yuklash ekranini yashirish
                 return;
             }
 
             try {
-                setLogLevel('error'); // Only log errors and warnings for clean console
+                setLogLevel('error'); // Faqat xato va ogohlantirishlarni konsolga chiqarish
                 app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
                 auth = getAuth(app);
@@ -1234,30 +1233,36 @@
                 // Authentication using custom token or anonymously
                 if (initialAuthToken) {
                     await signInWithCustomToken(auth, initialAuthToken);
+                    console.log("SUCCESS: Custom token orqali kirildi.");
                 } else {
                     await signInAnonymously(auth);
+                    console.log("SUCCESS: Anonim tarzda kirildi.");
                 }
 
                 // Wait for auth state change to get the final user ID
                 onAuthStateChanged(auth, (user) => {
                     if (user) {
                         userId = user.uid;
-                        console.log("Foydalanuvchi muvaffaqiyatli autentifikatsiyadan o'tdi. ID:", userId);
+                        console.log("SUCCESS: Foydalanuvchi ID:", userId);
                         isAuthReady = true;
                         loadUserData();
                     } else {
                         // Fallback: If anonymous sign-in failed, use a random ID (won't save to Firestore without login)
                         userId = 'guest-' + (crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2, 9));
-                        console.warn("Autentifikatsiya muvaffaqiyatsiz tugadi, Mehmon ID yaratildi:", userId);
+                        console.warn("DIQQAT: Autentifikatsiya muvaffaqiyatsiz tugadi (yoki mehmon), Mehmon ID yaratildi:", userId);
                         isAuthReady = true;
                         updateProfileUI(); // Update UI with fallback/guest data
-                        hideLoadingScreen();
+                        hideLoadingScreen(); // Xato bo'lsa ham yuklash ekranini yashirish
                     }
+                }, (error) => {
+                    console.error("FIREBASE XATOSI: Autentifikatsiya o'zgarishini kuzatishda xato:", error);
+                    showModal("Tizim Xatosi", "Autentifikatsiya xatosi yuz berdi. Konsolni tekshiring.");
+                    hideLoadingScreen(); // Xato bo'lsa ham yuklash ekranini yashirish
                 });
 
             } catch (e) {
-                console.error("Firebase ishga tushirishda xato:", e);
-                showModal("Tizim Xatosi", "Firebase ishga tushirishda xato yuz berdi: " + e.message);
+                console.error("FIREBASE XATOSI: Firebase ishga tushirishda xato:", e);
+                showModal("Tizim Xatosi", "Firebase ishga tushirishda xato yuz berdi: " + e.message + ". Konsolni tekshiring!");
                 isAuthReady = true;
                 hideLoadingScreen();
             }
@@ -1265,7 +1270,10 @@
 
         /** Loads user data from Firestore using an onSnapshot listener. */
         function loadUserData() {
-            if (!isAuthReady || !userId) return;
+            if (!isAuthReady || !userId) {
+                console.warn("DIQQAT: loadUserData ishga tushirilmadi: Auth tayyor emas yoki ID yo'q.");
+                return;
+            }
 
             const userDocRef = doc(db, 'artifacts', appId, 'users', userId, 'profile', 'data');
             
@@ -1276,9 +1284,9 @@
                     userData.totalScore = data.totalScore || 0;
                     userData.gamesPlayed = data.gamesPlayed || 0;
                     userData.bestScores = data.bestScores || {};
-                    console.log("Foydalanuvchi ma'lumotlari Firestore'dan yuklandi.");
+                    console.log("SUCCESS: Foydalanuvchi ma'lumotlari Firestore'dan yuklandi.");
                 } else {
-                    console.log("Foydalanuvchi profili mavjud emas. Yangi profil yaratilmoqda.");
+                    console.log("DIQQAT: Foydalanuvchi profili mavjud emas. Yangi profil yaratilmoqda.");
                     // Create initial profile data if it doesn't exist
                     saveUserData({
                         totalScore: 0,
@@ -1290,8 +1298,9 @@
                 updateProfileUI();
                 hideLoadingScreen();
             }, (error) => {
-                console.error("Profil ma'lumotlarini yuklashda xato:", error);
-                hideLoadingScreen();
+                console.error("FIREBASE XATOSI: Profil ma'lumotlarini yuklashda xato (onSnapshot):", error);
+                showModal("Xato", "Profil ma'lumotlarini yuklashda xato. Konsolni tekshiring.");
+                hideLoadingScreen(); // Xato bo'lsa ham yuklash ekranini yashirish
             });
         }
 
