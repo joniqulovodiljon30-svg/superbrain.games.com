@@ -1,3 +1,4 @@
+// Memory Master - TO'LIQ ISHLAYDIGAN VERSIYA
 const MemoryMaster = {
     // Asosiy o'zgaruvchilar
     currentSection: 'profile-section',
@@ -163,6 +164,32 @@ const MemoryMaster = {
             german: { name: "Nemischa", flag: "🇩🇪" },
             french: { name: "Fransuzcha", flag: "🇫🇷" },
             uzbek: { name: "O'zbekcha", flag: "🇺🇿" }
+        },
+
+        topics: [
+            "Oziq-ovqat", "Transport", "Uy-ro'zg'or", "Kasblar", "Sport"
+        ],
+
+        vocabulary: {
+            english: {
+                "Oziq-ovqat": [
+                    { word: "Apple", pronunciation: "[ˈæp.əl]", translation: "Olma" },
+                    { word: "Bread", pronunciation: "[bred]", translation: "Non" },
+                    { word: "Cheese", pronunciation: "[tʃiːz]", translation: "Pishloq" }
+                ],
+                "Transport": [
+                    { word: "Car", pronunciation: "[kɑːr]", translation: "Mashina" },
+                    { word: "Bus", pronunciation: "[bʌs]", translation: "Avtobus" },
+                    { word: "Train", pronunciation: "[treɪn]", translation: "Poyezd" }
+                ]
+            },
+            uzbek: {
+                "Oziq-ovqat": [
+                    { word: "Olma", pronunciation: "[ol-ma]", translation: "Apple" },
+                    { word: "Non", pronunciation: "[non]", translation: "Bread" },
+                    { word: "Pishloq", pronunciation: "[pish-loq]", translation: "Cheese" }
+                ]
+            }
         },
 
         faces: [
@@ -465,7 +492,7 @@ const MemoryMaster = {
         this.setupResultsButtons('numbers');
     },
 
-       // ==================== SO'ZLAR O'YINI ====================
+    // ==================== SO'ZLAR O'YINI ====================
     startWordsGame() {
         this.createGameSection('words', 'So\'zlar O\'yini', `
             <div class="settings-screen">
@@ -473,26 +500,21 @@ const MemoryMaster = {
                     <label>Til:</label>
                     <select id="words-language">
                         <option value="english">Inglizcha</option>
-                        <option value="korean">Koreyscha</option>
-                        <option value="japanese">Yaponcha</option>
-                        <option value="chinese">Xitoycha</option>
-                        <option value="german">Nemischa</option>
-                        <option value="french">Fransuzcha</option>
                         <option value="uzbek">O'zbekcha</option>
                     </select>
                 </div>
                 <div class="setting-group">
                     <label>So'zlar soni:</label>
-                    <input type="number" id="words-count" min="5" max="100" value="15">
+                    <input type="number" id="words-count" min="3" max="10" value="5">
                 </div>
                 <div class="setting-group">
-                    <label>Eslab qolish vaqti (soniya):</label>
-                    <input type="number" id="words-time" min="10" max="600" value="60">
+                    <label>Vaqt (soniya):</label>
+                    <input type="number" id="words-time" min="10" max="60" value="20">
                 </div>
                 <button id="start-words" class="start-btn">Boshlash</button>
             </div>
             <div class="display-screen" style="display:none">
-                <div class="timer" id="words-timer">60</div>
+                <div class="timer" id="words-timer">20</div>
                 <div class="words-list" id="words-list"></div>
             </div>
             <div class="input-screen" style="display:none">
@@ -501,7 +523,7 @@ const MemoryMaster = {
                 <button id="check-words" class="check-btn">Tekshirish</button>
             </div>
             <div class="results-screen" style="display:none">
-                <h3>So'zlar Natijalari</h3>
+                <h3>Natijalar</h3>
                 <div class="score-display">
                     <div class="score-circle">
                         <span id="words-score">0</span>
@@ -529,24 +551,11 @@ const MemoryMaster = {
     },
 
     startWordsRound(language, count, time) {
-        // words.js dan so'zlarni olish
-        if (!window.wordsGame) {
-            alert('So\'zlar moduli yuklanmagan!');
-            return;
-        }
-
-        // Sozlamalarni o'rnatish
-        const settings = {
-            language: language,
-            wordsCount: count,
-            studyTime: time
-        };
-
-        window.wordsGame.initializeSettings(settings);
-        const words = window.wordsGame.startGame();
-
+        const topic = this.DataManager.topics[Math.floor(Math.random() * this.DataManager.topics.length)];
+        const words = this.DataManager.getRandomWords(language, topic, count);
+        
         if (words.length === 0) {
-            alert('So\'zlar topilmadi! Boshqa til tanlang.');
+            alert('So\'zlar topilmadi! Boshqa til yoki mavzu tanlang.');
             return;
         }
 
@@ -567,7 +576,9 @@ const MemoryMaster = {
             const div = document.createElement('div');
             div.className = 'word-item';
             div.innerHTML = `
-                <strong>${index + 1}. ${word}</strong>
+                <strong>${index + 1}. ${word.word}</strong>
+                <small>${word.pronunciation}</small>
+                <div>${word.translation}</div>
             `;
             wordsList.appendChild(div);
         });
@@ -586,9 +597,10 @@ const MemoryMaster = {
             div.className = 'word-input-item';
             div.innerHTML = `
                 <div class="word-input-label">
-                    <strong>${index + 1}. So'zni kiriting:</strong>
+                    <strong>${index + 1}. ${word.word}</strong>
+                    <br><small>${word.pronunciation}</small>
                 </div>
-                <input type="text" class="word-input-field" placeholder="So'zni yozing..." data-index="${index}">
+                <input type="text" class="word-input-field" placeholder="Tarjimasini yozing..." data-index="${index}">
             `;
             inputList.appendChild(div);
         });
@@ -598,10 +610,8 @@ const MemoryMaster = {
         const inputs = document.querySelectorAll('#words-input-list .word-input-field');
         const userAnswers = [];
         
-        inputs.forEach((input, index) => {
+        inputs.forEach(input => {
             userAnswers.push(input.value.trim());
-            // words.js ga javobni saqlash
-            window.wordsGame.addUserAnswer(index, input.value.trim());
         });
 
         this.currentGame.userAnswers = userAnswers;
@@ -609,48 +619,50 @@ const MemoryMaster = {
     },
 
     showWordsResults() {
-        // words.js dan natijalarni olish
-        const results = window.wordsGame.calculateResults();
-        
         const correctWords = this.currentGame.words;
         const userAnswers = this.currentGame.userAnswers;
+        
+        let correctCount = 0;
+        const results = [];
+
+        correctWords.forEach((word, index) => {
+            const userAnswer = userAnswers[index];
+            const isCorrect = userAnswer.toLowerCase() === word.translation.toLowerCase();
+            if (isCorrect) correctCount++;
+            
+            results.push({ word, userAnswer, isCorrect, index });
+        });
+
+        const percentage = Math.round((correctCount / correctWords.length) * 100);
+        const score = Math.round((correctCount / correctWords.length) * 1000);
 
         this.showGameScreen('words', 'input', 'results');
-        document.getElementById('words-score').textContent = results.score;
+        document.getElementById('words-score').textContent = score;
 
         const comparison = document.getElementById('words-comparison');
         comparison.innerHTML = '';
         
-        results.results.forEach((result, index) => {
+        results.forEach(result => {
             const div = document.createElement('div');
             div.className = `result-item ${result.isCorrect ? 'correct' : 'incorrect'}`;
             if (result.isCorrect) {
                 div.innerHTML = `
-                    <strong>${index + 1}. ${result.word}</strong>
+                    <strong>${result.word.word}</strong> 
+                    <small>${result.word.pronunciation}</small>
                     <div>Sizning javobingiz: <strong style="color:#10b981">${result.userAnswer}</strong> ✓</div>
                 `;
             } else {
                 div.innerHTML = `
-                    <strong>${index + 1}. ${result.word}</strong>
+                    <strong>${result.word.word}</strong> 
+                    <small>${result.word.pronunciation}</small>
                     <div>
                         <span style="color:#ef4444">${result.userAnswer || 'Javob yo\'q'}</span> → 
-                        <span style="color:#10b981">${result.word}</span>
+                        <span style="color:#10b981">${result.word.translation}</span>
                     </div>
                 `;
             }
             comparison.appendChild(div);
         });
-
-        this.StorageManager.saveGameResult({
-            gameType: 'words',
-            score: results.score,
-            total: results.totalWords,
-            percentage: Math.round((results.correctCount / results.totalWords) * 100),
-            correctCount: results.correctCount
-        });
-
-        this.setupResultsButtons('words');
-    },
 
         this.StorageManager.saveGameResult({
             gameType: 'words',
