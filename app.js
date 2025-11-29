@@ -166,6 +166,42 @@ const MemoryMaster = {
             uzbek: { name: "O'zbekcha", flag: "🇺🇿" }
         },
 
+        topics: [
+            "Oziq-ovqat", "Transport", "Uy-ro'zg'or", "Kasblar", "Sport"
+        ],
+
+        vocabulary: {
+            english: {
+                "Oziq-ovqat": [
+                    { word: "Apple", pronunciation: "[ˈæp.əl]", translation: "Olma" },
+                    { word: "Bread", pronunciation: "[bred]", translation: "Non" },
+                    { word: "Cheese", pronunciation: "[tʃiːz]", translation: "Pishloq" }
+                ],
+                "Transport": [
+                    { word: "Car", pronunciation: "[kɑːr]", translation: "Mashina" },
+                    { word: "Bus", pronunciation: "[bʌs]", translation: "Avtobus" },
+                    { word: "Train", pronunciation: "[treɪn]", translation: "Poyezd" }
+                ]
+            },
+            uzbek: {
+                "Oziq-ovqat": [
+                    { word: "Olma", pronunciation: "[ol-ma]", translation: "Apple" },
+                    { word: "Non", pronunciation: "[non]", translation: "Bread" },
+                    { word: "Pishloq", pronunciation: "[pish-loq]", translation: "Cheese" }
+                ]
+            }
+        },
+
+        faces: [
+            { id: 1, name: "Ali", image: "👨", description: "Qora soch" },
+            { id: 2, name: "Malika", image: "👩", description: "Sariq soch" }
+        ],
+
+        images: [
+            { id: 1, name: "Tog'", image: "🏔️", description: "Qorli tog'" },
+            { id: 2, name: "Daryo", image: "🌊", description: "Oqimli daryo" }
+        ],
+
         generateRandomNumbers(count) {
             const numbers = [];
             for (let i = 0; i < count; i++) {
@@ -191,7 +227,7 @@ const MemoryMaster = {
             this.loadProfileData();
             this.hideLoadingScreen();
             this.showSection('profile-section');
-        }, 1);
+        }, 1000);
     },
 
     showLoadingScreen() {
@@ -455,6 +491,170 @@ const MemoryMaster = {
 
         this.setupResultsButtons('numbers');
     },
+
+    this.StorageManager.saveGameResult({
+            gameType: 'words',
+            score: score,
+            total: correctWords.length,
+            percentage: percentage,
+            correctCount: correctCount
+        });
+
+        this.setupResultsButtons('words');
+    },
+
+    // ==================== YORDAMCHI FUNKSIYALAR ====================
+    createGameSection(gameType, title, content) {
+        let section = document.getElementById(`${gameType}-section`);
+        if (!section) {
+            section = document.createElement('div');
+            section.id = `${gameType}-section`;
+            section.className = 'section';
+            section.innerHTML = `
+                <div class="game-header">
+                    <button class="back-btn">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <h2>${title}</h2>
+                </div>
+                <div class="game-content">
+                    ${content}
+                </div>
+            `;
+            document.getElementById('app').appendChild(section);
+            
+            section.querySelector('.back-btn').addEventListener('click', () => {
+                this.showSection('profile-section');
+            });
+        }
+        this.showSection(`${gameType}-section`);
+    },
+
+    showGameScreen(gameType, hideScreen, showScreen) {
+        const hideElement = document.getElementById(`${gameType}-${hideScreen}`);
+        const showElement = document.getElementById(`${gameType}-${showScreen}`);
+        if (hideElement) hideElement.style.display = 'none';
+        if (showElement) showElement.style.display = 'block';
+    },
+
+    startTimer(gameType, time, onComplete) {
+        let timeLeft = time;
+        const timerElement = document.getElementById(`${gameType}-timer`);
+        
+        if (this.timer) clearInterval(this.timer);
+        
+        this.timer = setInterval(() => {
+            timeLeft--;
+            if (timerElement) timerElement.textContent = timeLeft;
+            
+            if (timeLeft <= 0) {
+                clearInterval(this.timer);
+                onComplete();
+            }
+        }, 1000);
+    },
+
+    setupResultsButtons(gameType) {
+        const homeBtn = document.querySelector(`#${gameType}-results .home-btn`);
+        const retryBtn = document.querySelector(`#${gameType}-results .retry-btn`);
+        
+        if (homeBtn) {
+            homeBtn.addEventListener('click', () => {
+                this.showSection('profile-section');
+            });
+        }
+        
+        if (retryBtn) {
+            retryBtn.addEventListener('click', () => {
+                this[`start${gameType.charAt(0).toUpperCase() + gameType.slice(1)}Game`]();
+            });
+        }
+    },
+
+    showSection(sectionId) {
+        const currentSection = document.getElementById(this.currentSection);
+        if (currentSection) currentSection.classList.remove('active');
+
+        const newSection = document.getElementById(sectionId);
+        if (newSection) {
+            newSection.classList.add('active');
+            this.currentSection = sectionId;
+            window.scrollTo(0, 0);
+        }
+    },
+
+    loadResultsData() {
+        const stats = this.StorageManager.getStats();
+        const results = this.StorageManager.getGameResults();
+
+        const totalGames = document.getElementById('total-games-played');
+        const averageScore = document.getElementById('average-score');
+        const bestScore = document.getElementById('best-score');
+
+        if (totalGames) totalGames.textContent = this.formatNumber(stats.totalGames);
+        if (averageScore) averageScore.textContent = this.formatNumber(stats.averageScore);
+        if (bestScore) bestScore.textContent = this.formatNumber(stats.totalScore);
+
+        this.updateResultsHistory(results);
+    },
+
+    updateResultsHistory(results) {
+        const historyList = document.getElementById('history-list');
+        if (!historyList) return;
+
+        if (results.length === 0) {
+            historyList.innerHTML = '<div style="text-align: center; padding: 2rem; color: #94a3b8;">Hali hech qanday oʻyin oʻynalmagan</div>';
+            return;
+        }
+
+        historyList.innerHTML = '';
+        results.slice(0, 10).forEach(result => {
+            const item = document.createElement('div');
+            item.className = 'history-item';
+            item.innerHTML = `
+                <div class="history-game">
+                    <strong>${this.getGameName(result.gameType)}</strong>
+                    <small>${this.formatDate(result.date)}</small>
+                </div>
+                <div class="history-score" style="background: ${this.getScoreColor(result.percentage)};">
+                    ${result.score}
+                </div>
+                <div class="history-date">
+                    <strong style="color: ${this.getScoreColor(result.percentage)};">${result.percentage}%</strong>
+                    <small>${result.correctCount}/${result.total}</small>
+                </div>
+            `;
+            historyList.appendChild(item);
+        });
+    },
+
+    getGameName(gameType) {
+        const names = {
+            'numbers': '🔢 Raqamlar',
+            'words': '📝 Soʻzlar', 
+            'flashcards': '🃏 Flashcards',
+            'faces': '👥 Yuz va Ismlar',
+            'images': '🖼️ Rasmlar'
+        };
+        return names[gameType] || gameType;
+    },
+
+    formatNumber(num) {
+        return new Intl.NumberFormat('uz-UZ').format(num);
+    },
+
+    formatDate(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('uz-UZ');
+    },
+
+    getScoreColor(percentage) {
+        if (percentage >= 90) return '#10b981';
+        if (percentage >= 70) return '#f59e0b';
+        if (percentage >= 50) return '#f97316';
+        return '#ef4444';
+    }
+};
 
 // Dasturni ishga tushirish
 document.addEventListener('DOMContentLoaded', function() {
